@@ -3,7 +3,7 @@
 ## PREREQUISITE
 
 - Choose a FIM algorithm from [here](https://www.philippe-fournier-viger.com/spmf/index.php?link=algorithms.php).
-- Find the original paper about chosen algorithm.
+- Find the original paper about chosen algorithm. [original paper here](https://www.researchgate.net/publication/220907052_CHARM_An_efficient_algorithm_for_Closed_Itemset_Mining)
 - Find 5 different datasets from [here](https://www.philippe-fournier-viger.com/spmf/index.php?link=datasets.php#d2).
 
 Note:
