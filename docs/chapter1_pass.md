@@ -1,8 +1,5 @@
-Phân tích luồng chính cần làm
-Chia việc
-Viết report
+# CHAPTER 1 - TODO LIST
 
----
 1. Implement cách sắp xếp thứ tự itemset (ordering func)
 2. Subsumed check, kiểm tra X có phải tập con và có support = support cha : cơ chế: hash table
 3. Implement, unit test cho Charm-property
@@ -11,7 +8,7 @@ Viết report
 
 ---
 
-# TO-DO
+## TODO
 | Thành viên                | Công việc chính                                                                                               | Đầu ra                                                               | Human | Deadline    |
 | ------------------------- | ------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | ----- | ----------- |
 | Người 1 – Data & Pipeline | Chuyển đổi dữ liệu từ horizontal sang vertical; xử lý input/output; Implement subsumed check bằng hash table; | Data loader, vertical database, pipeline CLI. Hash-based subsumption | Trúc  | 5/11-9/11   |
