@@ -7,7 +7,12 @@ using ..Repository
 
 export charm, charm_extend, run_charm
 
-"""Build the frequent 2-itemset collection used by CHARM's ordering heuristic."""
+"""
+    _frequent_pairs(nodes, minsup)
+
+Compute all frequent 2-itemsets (F₂) from singleton nodes to calculate CHARM's
+ordering weights[cite: 6].
+"""
 function _frequent_pairs(nodes::Vector{ITPair}, minsup::Int)::Vector{ITPair}
     pairs = ITPair[]
     for i in 1:length(nodes)-1
@@ -23,9 +28,8 @@ end
 """
     charm_extend(nodes, repo, minsup; frequent_pairs=[])
 
-Recursive CHARM-Extend over one prefix equivalence class.  `nodes` is kept as
-an ordinary vector; removals required by Properties 1 and 3 are represented by
-the local `removed` mask, avoiding mutation of the caller's vector.
+Recursively explore an equivalence class in depth-first order, applying CHARM
+Properties 1–4 to merge closures, prune branches, and store closed itemsets[cite: 6].
 """
 function charm_extend(
     nodes::Vector{ITPair},
@@ -49,40 +53,32 @@ function charm_extend(
             candidate = decision.candidate::ITPair
 
             if decision.relation == EQUAL
-                # Property 1: merge Y into X, remove Y, and propagate the
-                # closure extension to candidates already created for X.
-                x = ITPair(union(x.items, y.items), copy(x.tids))
+                # Property 1: Merge Y into X and existing children, then prune Y[cite: 6].
+                x = ITPair(union(x.items, y.items), x.tids)
                 removed[j] = true
                 for k in eachindex(child_nodes)
                     child = child_nodes[k]
-                    child_nodes[k] = ITPair(
-                        union(child.items, y.items), copy(child.tids)
-                    )
+                    child_nodes[k] = ITPair(union(child.items, y.items), child.tids)
                 end
             elseif decision.relation == LEFT_SUBSET
-                # Property 2: merge Y into X but retain Y for its own branch.
-                x = ITPair(union(x.items, y.items), copy(x.tids))
+                # Property 2: Merge Y into X and existing children, but keep Y[cite: 6].
+                x = ITPair(union(x.items, y.items), x.tids)
                 for k in eachindex(child_nodes)
                     child = child_nodes[k]
-                    child_nodes[k] = ITPair(
-                        union(child.items, y.items), copy(child.tids)
-                    )
+                    child_nodes[k] = ITPair(union(child.items, y.items), child.tids)
                 end
             elseif decision.relation == RIGHT_SUBSET
-                # Property 3: Y is redundant at this level; explore X ∪ Y
-                # in the child class.
+                # Property 3: Prune Y from current level and queue candidate[cite: 6].
                 removed[j] = true
                 push!(child_nodes, candidate)
             else
-                # Property 4: retain both siblings and explore the union.
+                # Property 4: Keep both nodes and queue candidate for recursion[cite: 6].
                 push!(child_nodes, candidate)
             end
         end
 
         if !isempty(child_nodes)
-            ordered_children = isempty(frequent_pairs) ?
-                order_itemsets(child_nodes) :
-                order_itemsets_charm(child_nodes, frequent_pairs)
+            ordered_children = order_itemsets_charm(child_nodes, frequent_pairs)
             charm_extend(
                 ordered_children,
                 repo,
@@ -91,7 +87,7 @@ function charm_extend(
             )
         end
 
-        # X contains any closure extensions accumulated by Properties 1/2.
+        # Insert X into repository if it is not subsumed[cite: 1, 6].
         consider!(repo, x)
     end
     return nothing
@@ -100,8 +96,8 @@ end
 """
     charm(db, minsup)
 
-Mine frequent closed itemsets from a vertical database using CHARM's
-tidset-based search.  `minsup` is an absolute transaction count.
+Main driver: filter frequent singletons, precompute F₂ item weights, sort the
+root equivalence class, and run `charm_extend` to return all closed itemsets[cite: 6].
 """
 function charm(db::VerticalDB, minsup::Int)::Vector{ClosedItemset}
     minsup >= 1 || throw(ArgumentError("minsup must be at least 1"))
@@ -115,16 +111,19 @@ function charm(db::VerticalDB, minsup::Int)::Vector{ClosedItemset}
     isempty(nodes) && return ClosedItemset[]
 
     frequent_pairs = _frequent_pairs(nodes, minsup)
-    nodes = isempty(frequent_pairs) ?
-        order_itemsets(nodes) :
-        order_itemsets_charm(nodes, frequent_pairs)
+    weight_map = Ordering.build_weight_map(frequent_pairs)
+    nodes = order_itemsets_charm(nodes, weight_map)
 
     repo = ClosedItemsetRepository()
-    charm_extend(nodes, repo, minsup; frequent_pairs = frequent_pairs)
+    charm_extend(nodes, repo, minsup; frequent_pairs = weight_map)
     return results(repo)
 end
 
-"""Contract-compatible alias for [`charm`](@ref)."""
+"""
+    run_charm(db, minsup)
+
+Alias for `charm(db, minsup)`[cite: 6].
+"""
 run_charm(db::VerticalDB, minsup::Int)::Vector{ClosedItemset} = charm(db, minsup)
 
 end # module Engine

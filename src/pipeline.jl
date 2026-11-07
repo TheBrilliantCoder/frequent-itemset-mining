@@ -2,6 +2,7 @@ module Pipeline
 
 using ..Models
 using ..Data
+using ..Engine
 
 export mine_file
 
@@ -17,7 +18,7 @@ Giữ nguyên thứ tự itemset và thứ tự từ điển của items theo Mo
 function mine_file(
     input_path::AbstractString;
     minsup::Int,
-    algorithm,
+    algorithm::Function = run_charm,
     input_format::Symbol = :txt,
     output_path::Union{AbstractString, Nothing} = nothing,
     output_format::Symbol = :txt
@@ -31,7 +32,7 @@ function mine_file(
     db = to_vertical(transactions)
     itemsets = algorithm(db, minsup)::Vector{ClosedItemset}
 
-    export_result(output_path; fmt = output_format; itemsets)
+    export_result(output_path; fmt = output_format, itemsets = itemsets)
 
     return itemsets
 end

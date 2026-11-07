@@ -34,9 +34,10 @@ Nhận kết quả từ CHARM và tạo file TXT theo chuẩn SPMF.
 function export_result(path::Union{AbstractString, Nothing} = nothing;
     fmt::Symbol = :txt,
     itemsets::Vector{ClosedItemset})
-    
-    if output_path !== nothing
-        open(output_path, "w") do io
+
+    fmt === :txt || throw(ArgumentError("Unsupported output format: $fmt"))
+    if path !== nothing
+        open(path, "w") do io
             for itemset in itemsets
                 println(io, join(itemset.items, " "), " #SUP: ", itemset.support)
             end
@@ -58,12 +59,12 @@ function to_vertical(transactions::Vector{Vector{Item}})::VerticalDB
 end
 
 """
-Lọc các item có |tids| >= minsup và bọc vào ITPair.
-Bắt buộc gọi trực tiếp `ordering_key` từ Người 2 để trả về danh sách được sắp xếp chuẩn.
-`sort_fn` là khóa sắp xếp, mặc định dùng `ordering_key`.
+Lọc các item có |tids| >= minsup và bọc vào ITPair, sau đó sắp xếp bằng
+CHARM frequent-pair weight. Khi chưa có frequent pairs, tie-breakers vẫn giữ
+kết quả tất định theo support và thứ tự từ điển.
 """
 function frequent_singletons(
-    db::VerticalDB, minsup::Int, sort_fn::Function = ordering_key
+    db::VerticalDB, minsup::Int; frequent_pairs = ITPair[]
 )::Vector{ITPair}
     nodes = ITPair[]
     for (item, tids) in db
@@ -71,7 +72,7 @@ function frequent_singletons(
             push!(nodes, ITPair(Itemset([item]), copy(tids)))
         end
     end
-    return sort!(nodes, by = sort_fn)
+    return order_itemsets_charm(nodes, frequent_pairs)
 end
 
 end # module Data

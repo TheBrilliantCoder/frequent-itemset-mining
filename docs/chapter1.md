@@ -15,8 +15,8 @@ Note:
 ## TASKS TO DO
 
 1. Implement algorithm **correctly**:
-   - [ ] Output all FI and corresponding supports
-   - [ ] Output matches results against SPMF version given the same input
+   - [x] Output all FI and corresponding supports
+   - [x] Output matches results against SPMF version given the same input
 
 2. **Reproduce** the output:
    - [ ] Automation test
