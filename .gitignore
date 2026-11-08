@@ -1,14 +1,8 @@
 Manifest.toml
-# Bỏ qua toàn bộ dữ liệu benchmark ngoại trừ file giữ chỗ .gitkeep
 data/benchmark/*
 !data/benchmark/.gitkeep
-
-# Không commit file thực thi ngoài
+*.zip
 tools/spmf.jar
-
-# File output tạm thời khi chạy test
 output*.txt
 *.tmp
-
-# Julia cache
 .julia/
