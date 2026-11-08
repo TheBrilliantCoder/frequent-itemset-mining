@@ -1,0 +1,4 @@
+name = "CharmMining"
+uuid = "6c1a6b2d-2f92-4a6c-9d42-7d3e99bb1e30"
+authors = ["CharmMining contributors"]
+version = "0.1.0"
