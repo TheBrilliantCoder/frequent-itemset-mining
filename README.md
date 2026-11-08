@@ -166,7 +166,7 @@ julia --project=. test/runtests.jl
 ### Kết quả nghiệm thu thực tế với SPMF Oracle
 Toàn bộ **115/115 bài test** đều vượt qua (Pass 100%) với thời gian thực thi xấp xỉ 15 giây:
 
-| Tập dữ liệu | Đặc tính | Số giao dịch ($|D|$) | Ngưỡng minsup | Số tập đóng tìm được | Tỷ lệ khớp với SPMF |
+| Tập dữ liệu | Đặc tính | Số giao dịch (\|D\|) | Ngưỡng minsup | Số tập đóng tìm được | Tỷ lệ khớp với SPMF |
 |---|---|---|---|---|---|
 | **contextPasquier99** | Mẫu nhỏ (Toy) | 9 | 22% (2 txs) | 9 | **100% (9/9)** |
 | **mushroom.txt** | Dense | 8.124 | 30% | 425 | **100% (425/425)** |
