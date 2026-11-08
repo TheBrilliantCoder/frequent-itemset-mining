@@ -6,6 +6,31 @@
 
 ---
 
+## PROJECT STRUCTURE
+Cấu trúc thư mục của dự án `CharmMining` được tổ chức như sau:
+
+```text
+CharmMining/
+├── Project.toml
+├── src/
+│   ├── CharmMining.jl
+│   ├── models.jl
+│   ├── data.jl
+│   ├── ordering.jl
+│   ├── properties.jl
+│   ├── repository.jl
+│   ├── engine.jl
+│   └── pipeline.jl
+└── test/
+    ├── runtests.jl
+    ├── test_data.jl
+    ├── test_ordering.jl
+    ├── test_properties.jl
+    ├── test_repository.jl
+    ├── test_engine.jl
+    └── test_oracle.jl
+```
+
 ## HOW TO RUN
 
 ### 1. Project Setup (Optional)
