@@ -11,7 +11,7 @@ export charm, charm_extend, run_charm
     _frequent_pairs(nodes, minsup)
 
 Compute all frequent 2-itemsets (F₂) from singleton nodes to calculate CHARM's
-ordering weights[cite: 6].
+ordering weights.
 """
 function _frequent_pairs(nodes::Vector{ITPair}, minsup::Int)::Vector{ITPair}
     pairs = ITPair[]
@@ -29,7 +29,7 @@ end
     charm_extend(nodes, repo, minsup; frequent_pairs=[])
 
 Recursively explore an equivalence class in depth-first order, applying CHARM
-Properties 1–4 to merge closures, prune branches, and store closed itemsets[cite: 6].
+Properties 1–4 to merge closures, prune branches, and store closed itemsets.
 """
 function charm_extend(
     nodes::Vector{ITPair},
@@ -53,7 +53,7 @@ function charm_extend(
             candidate = decision.candidate::ITPair
 
             if decision.relation == EQUAL
-                # Property 1: Merge Y into X and existing children, then prune Y[cite: 6].
+                # Property 1: Merge Y into X and existing children, then prune Y.
                 x = ITPair(union(x.items, y.items), x.tids)
                 removed[j] = true
                 for k in eachindex(child_nodes)
@@ -61,18 +61,18 @@ function charm_extend(
                     child_nodes[k] = ITPair(union(child.items, y.items), child.tids)
                 end
             elseif decision.relation == LEFT_SUBSET
-                # Property 2: Merge Y into X and existing children, but keep Y[cite: 6].
+                # Property 2: Merge Y into X and existing children, but keep Y.
                 x = ITPair(union(x.items, y.items), x.tids)
                 for k in eachindex(child_nodes)
                     child = child_nodes[k]
                     child_nodes[k] = ITPair(union(child.items, y.items), child.tids)
                 end
             elseif decision.relation == RIGHT_SUBSET
-                # Property 3: Prune Y from current level and queue candidate[cite: 6].
+                # Property 3: Prune Y from current level and queue candidate.
                 removed[j] = true
                 push!(child_nodes, candidate)
             else
-                # Property 4: Keep both nodes and queue candidate for recursion[cite: 6].
+                # Property 4: Keep both nodes and queue candidate for recursion.
                 push!(child_nodes, candidate)
             end
         end
@@ -87,7 +87,7 @@ function charm_extend(
             )
         end
 
-        # Insert X into repository if it is not subsumed[cite: 1, 6].
+        # Insert X into repository if it is not subsumed.
         consider!(repo, x)
     end
     return nothing
@@ -97,7 +97,7 @@ end
     charm(db, minsup)
 
 Main driver: filter frequent singletons, precompute F₂ item weights, sort the
-root equivalence class, and run `charm_extend` to return all closed itemsets[cite: 6].
+root equivalence class, and run `charm_extend` to return all closed itemsets.
 """
 function charm(db::VerticalDB, minsup::Int)::Vector{ClosedItemset}
     minsup >= 1 || throw(ArgumentError("minsup must be at least 1"))
@@ -122,7 +122,7 @@ end
 """
     run_charm(db, minsup)
 
-Alias for `charm(db, minsup)`[cite: 6].
+Alias for `charm(db, minsup)`.
 """
 run_charm(db::VerticalDB, minsup::Int)::Vector{ClosedItemset} = charm(db, minsup)
 

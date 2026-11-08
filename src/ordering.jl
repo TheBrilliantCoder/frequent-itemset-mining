@@ -27,7 +27,7 @@ end
 
 Return the CHARM weight of `item` (sum of supports of frequent 2-itemsets
 containing it). Uses O(1) lookup if passed a precomputed weight dictionary,
-or falls back to scanning `frequent_pairs`[cite: 4].
+or falls back to scanning `frequent_pairs`.
 """
 function charm_weight(item::Item, frequent_pairs)::Int
     frequent_pairs isa Dict{Item, Int} && return get(frequent_pairs, item, 0)
@@ -45,7 +45,7 @@ end
 
 Create a deterministic sort key `(total_weight, support, sorted_items)` for an
 `ITPair` so lower weights are visited first, with support and lexicographical
-order as tie-breakers[cite: 4].
+order as tie-breakers.
 """
 function charm_ordering_key(
     node::ITPair,
@@ -59,7 +59,7 @@ end
     order_itemsets_charm(nodes, frequent_pairs)
 
 Return a new vector of `ITPair`s sorted in increasing order of CHARM weight
-using a precomputed weight map[cite: 4].
+using a precomputed weight map.
 """
 function order_itemsets_charm(
     nodes::Vector{ITPair},

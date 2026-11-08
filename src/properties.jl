@@ -8,7 +8,7 @@ export CharmRelation, EQUAL, LEFT_SUBSET, RIGHT_SUBSET, INCOMPARABLE,
 """
     CharmRelation
 
-Enum representing the four possible subset relations between two tidsets[cite: 2].
+Enum representing the four possible subset relations between two tidsets.
 """
 @enum CharmRelation begin
     EQUAL          # t(X) == t(Y)
@@ -20,7 +20,7 @@ end
 """
     classify_relation(tx, ty)
 
-Determine the subset relation between tidsets `tx` and `ty`[cite: 2], using length
+Determine the subset relation between tidsets `tx` and `ty`, using length
 checks first to avoid unnecessary subset scans.
 """
 function classify_relation(tx::Tidset, ty::Tidset)::CharmRelation
@@ -39,7 +39,7 @@ end
     combine_nodes(x, y)
 
 Combine two `ITPair`s by taking the union of their items and the intersection
-of their tidsets (`X ∪ Y × (t(X) ∩ t(Y))`)[cite: 2].
+of their tidsets (`X ∪ Y × (t(X) ∩ t(Y))`).
 """
 function combine_nodes(x::ITPair, y::ITPair)::ITPair
     return ITPair(union(x.items, y.items), intersect(x.tids, y.tids))
@@ -49,7 +49,7 @@ end
     CharmPropertyResult
 
 Hold the outcome of `charm_property`: whether the combined pair is frequent,
-its `CharmRelation` (Properties 1–4), and the resulting candidate `ITPair`[cite: 2].
+its `CharmRelation` (Properties 1–4), and the resulting candidate `ITPair`.
 """
 struct CharmPropertyResult
     frequent::Bool
@@ -60,7 +60,7 @@ end
 """
     charm_property(x, y, minsup)
 
-Intersect `x` and `y` tidsets, prune if support < `minsup`[cite: 2], and classify
+Intersect `x` and `y` tidsets, prune if support < `minsup`, and classify
 their CHARM relation in O(1) time using precomputed tidset lengths.
 """
 function charm_property(x::ITPair, y::ITPair, minsup::Int)::CharmPropertyResult

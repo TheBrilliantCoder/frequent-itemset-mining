@@ -8,7 +8,7 @@ export ClosedItemsetRepository, tid_checksum, consider!, results
     ClosedItemsetRepository()
 
 Two-level hash table storing closed itemsets, indexed by support and then by
-TID sum checksum to enable fast subsumption checks[cite: 1].
+TID sum checksum to enable fast subsumption checks.
 """
 mutable struct ClosedItemsetRepository
     buckets::Dict{Int, Dict{UInt64, Vector{ITPair}}}
@@ -20,7 +20,7 @@ end
     tid_checksum(tids)
 
 Compute the hash key for a tidset by summing all its transaction IDs
-(`h(t(X)) = sum(tid)`)[cite: 1].
+(`h(t(X)) = sum(tid)`).
 """
 function tid_checksum(tids::Tidset)::UInt64
     total = UInt64(0)
@@ -34,7 +34,7 @@ end
     consider!(repo, candidate) -> Bool
 
 Perform fast subsumption check: insert `candidate` if no equal-support superset
-exists in its checksum bucket, and prune any strict subsets it subsumes[cite: 1].
+exists in its checksum bucket, and prune any strict subsets it subsumes.
 """
 function consider!(repo::ClosedItemsetRepository, candidate::ITPair)::Bool
     supp = support(candidate)
@@ -64,7 +64,7 @@ end
     results(repo)
 
 Extract all stored closed itemsets, sorted by decreasing support and then
-lexicographically by item names[cite: 1].
+lexicographically by item names.
 """
 function results(repo::ClosedItemsetRepository)::Vector{ClosedItemset}
     nodes = ITPair[]
