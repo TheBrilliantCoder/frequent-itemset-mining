@@ -19,9 +19,9 @@ Note:
    - [x] Output matches results against SPMF version given the same input
 
 2. **Reproduce** the output:
-   - [ ] Automation test
-   - [ ] Run in at least 5 different datasets/databases
-   - [ ] Report identical rate against the SPMF version
+   - [x] Automation test
+   - [x] Run in at least 5 different datasets/databases
+   - [x] Report identical rate against the SPMF version
 
 3. Optimize **memory and speed**:
    - [ ] Apply at least 1 optimization technique to algorithm
