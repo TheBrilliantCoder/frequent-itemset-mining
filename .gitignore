@@ -1,1 +1,8 @@
 Manifest.toml
+data/benchmark/*
+!data/benchmark/.gitkeep
+*.zip
+tools/spmf.jar
+output*.txt
+*.tmp
+.julia/
