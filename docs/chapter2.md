@@ -51,3 +51,11 @@
 7. **Analysis & Discussion**:
    - [ ] Identify strengths and performance bottlenecks of the group's implementation relative to SPMF.
    - [ ] Propose at least **2 concrete future optimization directions** grounded in theoretical analysis.
+
+
+Note: save metrics, don't need plot
+
+Truc: Execution time and Number of Itemset
+Loc: Memory and scalable
+Khai: 1 Optimize and propose 2 optimization
+
