@@ -53,6 +53,7 @@ function dataset_path(name::AbstractString)
     candidates = (
         joinpath(REPOSITORY_ROOT, "data", "toy", name * ".txt"),
         joinpath(REPOSITORY_ROOT, "data", name * ".txt"),
+        joinpath(REPOSITORY_ROOT, "data", "benchmark", name * ".txt"),
     )
     for path in candidates
         isfile(path) && return path
