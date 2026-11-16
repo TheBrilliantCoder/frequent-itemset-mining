@@ -27,24 +27,32 @@ end
         toy_path = joinpath(@__DIR__, "..", "data", "toy", "contextPasquier99.txt")
         if isfile(toy_path)
             @info "Verifying with SPMF on Toy Dataset (contextPasquier99)..."
-            out_julia = tempname() * ".txt"
-            out_spmf = tempname() * ".txt"
+            out_julia     = tempname() * ".txt"
+            out_julia_opt = tempname() * ".txt"
+            out_spmf      = tempname() * ".txt"
 
             try
                 mine_file(toy_path; minsup = 2, output_path = out_julia)
+                mine_file_bit(toy_path; minsup = 2, output_path = out_julia_opt)
                 run(`java -jar $spmf_jar run Charm_bitset $toy_path $out_spmf 22%`)
 
-                julia_res = parse_spmf_file(out_julia)
-                spmf_res = parse_spmf_file(out_spmf)
+                julia_res     = parse_spmf_file(out_julia)
+                julia_opt_res = parse_spmf_file(out_julia_opt)
+                spmf_res      = parse_spmf_file(out_spmf)
 
                 @test length(julia_res) == length(spmf_res)
+                @test length(julia_opt_res) == length(spmf_res)
+
                 for (itemset, sup) in spmf_res
                     @test haskey(julia_res, itemset)
                     @test julia_res[itemset] == sup
+                    @test haskey(julia_opt_res, itemset)
+                    @test julia_opt_res[itemset] == sup
                 end
-                @info "-> Toy Dataset: Passed 100% match."
+                @info "-> Toy Dataset: Passed 100% match (both Baseline & Optimized)."
             finally
                 rm(out_julia, force = true)
+                rm(out_julia_opt, force = true)
                 rm(out_spmf, force = true)
             end
         end
@@ -68,37 +76,47 @@ end
             end
 
             @info "Verifying with SPMF on Benchmark: $filename (minsup = $spmf_arg)..."
-            out_julia = tempname() * ".txt"
-            out_spmf = tempname() * ".txt"
+            out_julia     = tempname() * ".txt"
+            out_julia_opt = tempname() * ".txt"
+            out_spmf      = tempname() * ".txt"
 
             try
                 txs = load_transactions(input_path)
                 minsup_count = ceil(Int, length(txs) * ratio)
 
-                # Chạy cài đặt Julia của nhóm
+                # Chạy cài đặt Julia (cả bản Cơ bản và bản Tối ưu)
                 mine_file(input_path; minsup = minsup_count, output_path = out_julia)
+                mine_file_bit(input_path; minsup = minsup_count, output_path = out_julia_opt)
 
                 # Chạy SPMF đối chứng
                 run(`java -jar $spmf_jar run Charm_bitset $input_path $out_spmf $spmf_arg`)
 
-                julia_res = parse_spmf_file(out_julia)
-                spmf_res = parse_spmf_file(out_spmf)
+                julia_res     = parse_spmf_file(out_julia)
+                julia_opt_res = parse_spmf_file(out_julia_opt)
+                spmf_res      = parse_spmf_file(out_spmf)
 
                 # So khớp tổng số lượng itemset đóng
                 @test length(julia_res) == length(spmf_res)
+                @test length(julia_opt_res) == length(spmf_res)
 
                 # So khớp từng itemset và giá trị support tương ứng
-                mismatches = 0
+                mismatches_basic = 0
+                mismatches_opt   = 0
                 for (itemset, sup) in spmf_res
                     if !haskey(julia_res, itemset) || julia_res[itemset] != sup
-                        mismatches += 1
+                        mismatches_basic += 1
+                    end
+                    if !haskey(julia_opt_res, itemset) || julia_opt_res[itemset] != sup
+                        mismatches_opt += 1
                     end
                 end
 
-                @test mismatches == 0
-                @info "-> $filename: 100% match ($(length(spmf_res)) closed itemsets)."
+                @test mismatches_basic == 0
+                @test mismatches_opt == 0
+                @info "-> $filename: 100% match ($(length(spmf_res)) closed itemsets, Baseline & Optimized)."
             finally
                 rm(out_julia, force = true)
+                rm(out_julia_opt, force = true)
                 rm(out_spmf, force = true)
             end
         end
