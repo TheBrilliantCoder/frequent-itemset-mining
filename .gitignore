@@ -6,3 +6,4 @@ tools/spmf.jar
 output*.txt
 *.tmp
 .julia/
+*.svg
