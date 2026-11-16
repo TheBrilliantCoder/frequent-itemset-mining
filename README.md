@@ -1,6 +1,8 @@
 # CharmMining: Khai thác tập phổ biến đóng với thuật toán CHARM
 
-Dự án cài đặt từ đầu (scratch implementation) thuật toán **CHARM** (Closed Association Rule Mining) bằng ngôn ngữ **Julia**, phục vụ bài toán khai thác tập phổ biến đóng (Frequent Closed Itemset Mining - FIM). Hệ thống sử dụng cấu trúc cơ sở dữ liệu dạng dọc (Vertical Database) kết hợp `BitSet` để biểu diễn tidset, sắp xếp thứ tự duyệt bằng trọng số tần số 2-itemsets, và cơ chế kiểm tra bao hàm (subsumption checking) qua bảng băm TID checksum.
+Dự án cài đặt từ đầu (scratch implementation) thuật toán **CHARM** (Closed Association Rule Mining) bằng ngôn ngữ **Julia**, phục vụ bài toán khai thác tập phổ biến đóng (Frequent Closed Itemset Mining - FIM). Hệ thống cung cấp hai phiên bản cài đặt đối xứng để đối chiếu hiệu năng:
+- **Bản cơ bản (Baseline):** Sử dụng cơ sở dữ liệu dạng dọc (Vertical Database) kết hợp `BitSet` để biểu diễn tidset, sắp xếp thứ tự duyệt bằng trọng số tần số 2-itemsets, và kiểm tra bao hàm (subsumption checking) qua bảng băm tổng TID.
+- **Bản tối ưu (Optimized):** Tối ưu hóa cấp độ thấp với mảng bit liền kề `BitVector` kết hợp tập lệnh вектор hóa `@inbounds @simd`, mã hóa `Itemset` thành mảng số nguyên có thứ tự `Vector{Int32}`, cắt tỉa hai pha không cấp phát bộ nhớ (Zero-Allocation Pruning) và hàm băm 64-bit XOR checksum.
 
 Toàn bộ thuật toán được kiểm thử tự động và đối chuẩn khớp 100% với thư viện chuẩn **SPMF (Java)**.
 
@@ -32,16 +34,28 @@ CharmMining/
 │   └── spmf.jar              # Thư viện SPMF phục vụ kiểm thử đối chứng Oracle
 ├── src/
 │   ├── CharmMining.jl        # Module chính (entrypoint tổng hợp các submodule)
-│   ├── models.jl             # Định nghĩa cấu trúc dữ liệu: ITPair, ClosedItemset, Tidset (BitSet)
+│   ├── models.jl             # Định nghĩa cấu trúc dữ liệu cơ bản: ITPair, ClosedItemset, Tidset (BitSet)
 │   ├── data.jl               # Xử lý I/O dữ liệu chuẩn SPMF, chuyển đổi VerticalDB
 │   ├── ordering.jl           # Sắp xếp nút theo trọng số CHARM weight (F2)
 │   ├── properties.jl         # Định nghĩa và phân loại 4 tính chất CHARM-Property
 │   ├── repository.jl         # ClosedItemsetRepository & Hash-based Subsumption Checking
 │   ├── engine.jl             # Thuật toán duyệt đệ quy IT-Tree (charm, charm_extend)
-│   └── pipeline.jl           # Pipeline cấp cao mine_file tích hợp đọc - lọc - khai thác - ghi
+│   ├── pipeline.jl           # Pipeline cấp cao mine_file tích hợp đọc - lọc - khai thác - ghi
+│   ├── save_metrics.jl       # Script đo đạc thực nghiệm (Baseline vs. Optimized) và xuất CSV
+│   └── optimized/            # Module tối ưu hóa (BitVector + Int32 + @simd)
+│       ├── Optimized.jl      # Submodule gom và export các thành phần tối ưu
+│       ├── models.jl         # FastBitTidset (BitVector), FastITNode (Vector{Int32}), BitVerticalDB
+│       ├── ordering.jl       # Tính trọng số F2 bằng @simd count_ones & sắp xếp tại chỗ
+│       ├── properties.jl     # Giao BitVector hai pha (Zero-Allocation) & tái sử dụng vùng nhớ
+│       ├── repository.jl     # Bảng băm 2 tầng với 64-bit XOR checksum & sorted_issubset
+│       └── engine.jl         # Vòng lặp đệ quy charm_extend_bit & pipeline mine_file_bit
 ├── data/
 │   ├── toy/                  # CSDL nhỏ kiểm thử nhanh (contextPasquier99.txt)
 │   └── benchmark/            # CSDL benchmark chuẩn FIMI (chess, mushroom, retail, T10I4D100K, accidents)
+├── results/                  # Thư mục lưu kết quả đo lường hiệu năng (.csv)
+│   ├── metrics_minsup.csv    # Metrics thời gian, bộ nhớ, số tập đóng theo minsup
+│   ├── metrics_scalability.csv # Metrics khả năng mở rộng (10% -> 100% dữ liệu)
+│   └── metrics_tx_length.csv # Metrics ảnh hưởng của độ dài giao dịch trung bình
 └── test/
     ├── runtests.jl           # Master test runner
     ├── test_data.jl          # Unit test: Đọc file, xử lý comment, chuyển đổi VerticalDB
@@ -49,6 +63,7 @@ CharmMining/
     ├── test_properties.jl    # Unit test: Kiểm thử độc lập 4 tính chất CHARM
     ├── test_repository.jl    # Unit test: TID checksum băm và thuật toán consider!
     ├── test_engine.jl        # Integration test: Khai thác trên CSDL Pasquier 1999
+    ├── test_optimized.jl     # Unit & Integration test: Kiểm thử toàn diện bản tối ưu & đối chiếu Baseline
     └── test_oracle.jl        # Oracle test: Đối chuẩn tự động 100% với SPMF trên 5 benchmark
 ```
 
@@ -73,7 +88,7 @@ Ví dụ (`data/toy/contextPasquier99.txt`):
 ```
 
 ### Chạy thuật toán qua script `run.jl`
-Mở file `run.jl` tại thư mục gốc để cấu hình đường dẫn file và ngưỡng hỗ trợ:
+Mở file `run.jl` tại thư mục gốc để cấu hình đường dẫn file và ngưỡng hỗ trợ (có thể chọn `mine_file` cho bản cơ bản hoặc `mine_file_bit` cho bản tối ưu):
 
 ```julia
 include("src/CharmMining.jl")
@@ -83,8 +98,8 @@ input_file = "data/toy/contextPasquier99.txt"
 output_file = "output.txt"
 min_support = 2  # Ngưỡng minsup dạng số lượng giao dịch (Int)
 
-println("Starting CHARM algorithm...")
-results = mine_file(input_file; minsup = min_support, output_path = output_file)
+println("Starting CHARM algorithm (Optimized)...")
+results = mine_file_bit(input_file; minsup = min_support, output_path = output_file)
 println("Found $(length(results)) closed itemsets.")
 ```
 
@@ -107,11 +122,23 @@ Kết quả được ghi nhận vào file đầu ra theo đúng chuẩn SPMF (`<
 2 4 #SUP: 2
 ```
 
+### Đo lường và lưu kết quả thực nghiệm (`save_metrics.jl`)
+Để tự động chạy đối chiếu hiệu năng (thời gian thực thi, bộ nhớ cấp phát, khả năng mở rộng) giữa phiên bản cơ bản và phiên bản tối ưu trên toàn bộ các bộ dữ liệu benchmark, thực thi lệnh:
+
+```bash
+julia --project=. src/save_metrics.jl
+```
+
+Kết quả đo lường sẽ được xuất trực tiếp ra thư mục `results/` dưới dạng các tệp CSV:
+- `results/metrics_minsup.csv`: Thời gian chạy, lượng RAM cấp phát, hệ số tăng tốc (`speedup`) và số lượng tập đóng qua các ngưỡng `minsup` giảm dần.
+- `results/metrics_scalability.csv`: Khả năng mở rộng của thuật toán khi tăng kích thước CSDL từ `10%` lên `100%` trên `retail.txt` và `accidents.txt`.
+- `results/metrics_tx_length.csv`: Đánh giá mức độ ổn định của phép giao bit khi tăng chiều rộng giao dịch trung bình trên dữ liệu tổng hợp.
+
 ---
 
 ## 4. Kiểm thử tự động & Đối chuẩn SPMF (Testing & Verification)
 
-Dự án sở hữu bộ test suite tự động gồm **115 bài kiểm thử**, bao phủ từ các hàm chức năng đơn lẻ cho đến kiểm thử chéo với SPMF.
+Dự án sở hữu bộ test suite tự động gồm **201 bài kiểm thử**, bao phủ từ các hàm chức năng đơn lẻ của cả hai phiên bản (Baseline và Optimized) cho đến kiểm thử chéo với SPMF.
 
 ### Chuẩn bị SPMF CLI (cho kiểm thử đối chứng)
 Tải file thực thi `spmf.jar` vào thư mục `tools/`:
@@ -119,22 +146,22 @@ Tải file thực thi `spmf.jar` vào thư mục `tools/`:
 - **Linux / macOS / WSL:**
   ```bash
   mkdir -p tools
-  curl -o tools/spmf.jar https://www.philippe-fournier-viger.com/spmf/spmf.jar
+  curl -o tools/spmf.jar [https://www.philippe-fournier-viger.com/spmf/spmf.jar](https://www.philippe-fournier-viger.com/spmf/spmf.jar)
   ```
 - **Windows (Command Prompt):**
   ```cmd
   mkdir tools
-  curl -o tools\spmf.jar https://www.philippe-fournier-viger.com/spmf/spmf.jar
+  curl -o tools\spmf.jar [https://www.philippe-fournier-viger.com/spmf/spmf.jar](https://www.philippe-fournier-viger.com/spmf/spmf.jar)
   ```
 
 *(Lưu ý: Nếu không có file `tools/spmf.jar`, bài test `test_oracle.jl` sẽ đưa ra cảnh báo và tự động bỏ qua mà không làm gián đoạn các unit test nội bộ khác).*
 
-### Chuẩn bị dữ liệu Benchmark (để chạy đầy đủ 115 test cases)
+### Chuẩn bị dữ liệu Benchmark (để chạy đầy đủ 201 test cases)
 
 Do các bộ dữ liệu benchmark có dung lượng lớn và nằm trong `.gitignore`, bạn có thể chuẩn bị dữ liệu theo các bước sau:
 
 1. **Tải dữ liệu về máy:**
-   - **Lựa chọn A (Khuyên dùng - Gói nén của nhóm):** Tải file `benchmark_datasets.zip` đã được chuẩn hóa sẵn tại drive của nhóm
+   - **Lựa chọn A (Khuyên dùng - Gói nén của nhóm):** Tải file `benchmark_datasets.zip` đã được chuẩn hóa sẵn tại drive của nhóm.
    - **Lựa chọn B (Tải trực tiếp từ web gốc):** Truy cập bằng trình duyệt vào [FIMI Repository](http://fimi.uantwerpen.be/data/) hoặc [SPMF Datasets](https://www.philippe-fournier-viger.com/spmf/index.php?link=datasets.php) để tải trực tiếp 5 file dữ liệu (`chess`, `mushroom`, `retail`, `T10I4D100K`, `accidents`).
 
 2. **Thêm dữ liệu vào thư mục dự án:**
@@ -161,10 +188,11 @@ julia --project=. test/runtests.jl
 | `test_properties.jl` | Kiểm thử cô lập 4 nhánh quan hệ CHARM-Property (`EQUAL`, `LEFT_SUBSET`, `RIGHT_SUBSET`, `INCOMPARABLE`) cùng cơ chế cắt tỉa nhánh không đủ `minsup`. |
 | `test_repository.jl` | Kiểm tra hàm băm tổng TID ($\sum \text{tid}$), kiểm tra khả năng xử lý va chạm băm và thuật toán `consider!` loại bỏ tập con cùng support. |
 | `test_engine.jl` | Kiểm thử tích hợp thuật toán CHARM trên bộ dữ liệu mẫu Pasquier 1999, xác thực tính đóng (không xuất hiện các tập con thừa). |
-| `test_oracle.jl` | Tự động chạy song song Julia CHARM và `Charm_bitset` của SPMF trên toàn bộ 5 CSDL benchmark, xác thực tỷ lệ khớp 100%. |
+| `test_optimized.jl` | Kiểm thử từng thành phần của bản tối ưu (`BitVerticalDB`, `sorted_union`, `charm_property_bit`, 64-bit XOR checksum) và đối chiếu khớp 100% với bản Baseline. |
+| `test_oracle.jl` | Tự động chạy song song cả hai bản Julia CHARM (`mine_file`, `mine_file_bit`) và `Charm_bitset` của SPMF trên toàn bộ 5 CSDL benchmark, xác thực tỷ lệ khớp 100%. |
 
 ### Kết quả nghiệm thu thực tế với SPMF Oracle
-Toàn bộ **115/115 bài test** đều vượt qua (Pass 100%) với thời gian thực thi xấp xỉ 15 giây:
+Toàn bộ **201/201 bài test** đều vượt qua (Pass 100%) trên cả phiên bản Baseline và Optimized:
 
 | Tập dữ liệu | Đặc tính | Số giao dịch (\|D\|) | Ngưỡng minsup | Số tập đóng tìm được | Tỷ lệ khớp với SPMF |
 |---|---|---|---|---|---|

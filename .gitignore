@@ -1,8 +1,34 @@
+# Julia environment & profiling artifacts
 Manifest.toml
+.julia/
+*.cov
+*.mem
+
+# Benchmark datasets & external tools
 data/benchmark/*
 !data/benchmark/.gitkeep
 *.zip
 tools/spmf.jar
+
+# Runtime, metrics & test outputs
+results/*.csv
+!results/.gitkeep
 output*.txt
 *.tmp
-.julia/
+
+# Jupyter Notebook & IDE / OS files
+.ipynb_checkpoints/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
