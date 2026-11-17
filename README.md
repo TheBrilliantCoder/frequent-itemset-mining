@@ -141,6 +141,22 @@ Kết quả đo lường sẽ được xuất trực tiếp ra thư mục `resul
 Dự án sở hữu bộ test suite tự động gồm **201 bài kiểm thử**, bao phủ từ các hàm chức năng đơn lẻ của cả hai phiên bản (Baseline và Optimized) cho đến kiểm thử chéo với SPMF.
 
 ### Chuẩn bị SPMF CLI (cho kiểm thử đối chứng)
+
+Tải [Java Development Kit](https://adoptium.net/temurin/releases) mới nhất để chạy được thư viện SPMF. 
+Sau đó thiết lập môi trường để máy nhận diện lệnh java. Sau đó kiểm tra:
+
+```java
+java --version
+```
+
+Output nên là:
+
+```text
+openjdk 25.0.5 2026-10-20 LTS
+OpenJDK Runtime Environment Temurin-25.0.5+8 (build 25.0.5+8-LTS)
+OpenJDK 64-Bit Server VM Temurin-25.0.5+8 (build 25.0.5+8-LTS, mixed mode, sharing)
+```
+
 Tải file thực thi `spmf.jar` vào thư mục `tools/`:
 
 - **Linux / macOS / WSL:**
