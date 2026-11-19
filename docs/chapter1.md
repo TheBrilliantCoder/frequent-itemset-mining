@@ -28,11 +28,11 @@ Note:
    - [ ] Evaluate and report any improvements compared against the basic version - the one we manually implement
 
 4. **Input & output** processing:
-   - [ ] Input as `.txt` file with the structure based on SPMF:
+   - [x] Input as `.txt` file with the structure based on SPMF:
      - Each line represents one transaction (or itemset).
      - Items are represented by positive integers (or sometimes strings), separated by a single space.
      - Items inside a line are usually sorted in ascending order.
-   - [ ] Output should be formatted like this:
+   - [x] Output should be formatted like this:
 
      ```text
      1 2 #SUP: 2
