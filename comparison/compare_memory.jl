@@ -4,8 +4,7 @@
 Peak-memory evaluation (Task 4) for CHARM:
 
   * basic     : Julia implementation without the optimization
-  * optimized : Julia implementation with the optimization
-                (needs `CharmMining.mine_file_optimized`; skipped until it exists)
+  * optimized : Julia implementation with BitVector/SIMD (`mine_file_bit`)
   * spmf      : SPMF `Charm_bitset` reference
 
 Every implementation runs in its own OS process.  Peak resident memory is read
@@ -24,16 +23,11 @@ Environment variables (all optional):
     SPMF_JAVA_OPTS    extra JVM flags, e.g. "-Xmx2g"
     MEMORY_RUNS       repetitions per point         (default 3)
     MEMORY_LIMIT_MB   kill a run above this RSS     (default 6000)
-    MEMORY_RESULTS    detailed CSV path             (default comparison/memory_result.csv)
-    MEMORY_SUMMARY    summary CSV path              (default comparison/memory_summary.csv)
+    MEMORY_RESULTS    detailed CSV path             (default comparison/metrics/memory_result.csv)
+    MEMORY_SUMMARY    summary CSV path              (default comparison/metrics/memory_summary.csv)
 """
 
-using Printf
-using Statistics
-
-const REPOSITORY_ROOT = normpath(joinpath(@__DIR__, ".."))
-
-const DATASET_NAMES = ["chess", "mushrooms", "retail", "T10I4D100K", "accidents"]
+include(joinpath(@__DIR__, "common.jl"))
 
 # One "median" support ratio per dataset: the middle of the range used in
 # compare_time.jl for the dataset's density class.
@@ -44,117 +38,7 @@ const MEMORY_RATIOS = Dict(
     "retail"     => 0.04,
     "T10I4D100K" => 0.04,
 )
-const DATASET_TYPES = Dict(
-    "chess" => "very dense", "mushrooms" => "dense", "accidents" => "very dense",
-    "retail" => "sparse", "T10I4D100K" => "sparse",
-)
-
-const IMPLEMENTATIONS = ["basic", "optimized", "spmf"]
-const SPMF_ALGORITHM = "Charm_bitset"
 const RUNS = parse(Int, get(ENV, "MEMORY_RUNS", "3"))
-const MAX_MEMORY_MB = parse(Float64, get(ENV, "MEMORY_LIMIT_MB", "6000"))
-
-include(joinpath(REPOSITORY_ROOT, "src", "CharmMining.jl"))
-using .CharmMining
-
-# --------------------------------------------------------------------------
-# Helpers
-# --------------------------------------------------------------------------
-
-function dataset_path(name::AbstractString)
-    for path in (
-        joinpath(REPOSITORY_ROOT, "data", "toy", name * ".txt"),
-        joinpath(REPOSITORY_ROOT, "data", name * ".txt"),
-        joinpath(REPOSITORY_ROOT, "data", "benchmark", name * ".txt"),
-    )
-        isfile(path) && return path
-    end
-    return nothing
-end
-
-spmf_path() = begin
-    configured = get(ENV, "SPMF_JAR", "")
-    isempty(configured) ? joinpath(REPOSITORY_ROOT, "tools", "spmf.jar") : abspath(configured)
-end
-
-optimized_available() = isdefined(CharmMining, :mine_file_optimized)
-
-count_itemsets(path) = count(line -> occursin("#SUP:", line), eachline(path))
-
-csv_field(value) = begin
-    text = string(value)
-    occursin(r"[,\"\n]", text) ? '"' * replace(text, '"' => "\"\"") * '"' : text
-end
-
-"Peak RSS (MB) of a running process: VmHWM, falling back to VmRSS."
-function process_peak_mb(pid)
-    status_path = "/proc/$pid/status"
-    isfile(status_path) || return 0.0
-    hwm = 0.0
-    rss = 0.0
-    try
-        for line in eachline(status_path)
-            if startswith(line, "VmHWM:")
-                hwm = parse(Float64, split(line)[2]) / 1024.0
-            elseif startswith(line, "VmRSS:")
-                rss = parse(Float64, split(line)[2]) / 1024.0
-            end
-        end
-    catch
-        # process vanished while reading
-    end
-    return max(hwm, rss)
-end
-
-"Run `command` and return (seconds, peak_mb, exceeded, ok)."
-function run_monitored(command::Cmd)
-    pid_file = tempname()
-    wrapped_command = Cmd(vcat(
-        ["/bin/sh", "-c", "echo \$\$ > \"$pid_file\"; exec \"\$@\"", "monitored"],
-        command.exec,
-    ))
-    started_ns = time_ns()
-    process = run(wrapped_command; wait = false)
-    pid = nothing
-    while pid === nothing && process_running(process)
-        if isfile(pid_file)
-            pid = tryparse(Int, strip(read(pid_file, String)))
-        end
-        pid === nothing && sleep(0.001)
-    end
-    peak_mb = 0.0
-    exceeded = false
-    if pid !== nothing
-        while process_running(process)
-            current = process_peak_mb(pid)
-            peak_mb = max(peak_mb, current)
-            if current > MAX_MEMORY_MB
-                exceeded = true
-                kill(process, Base.SIGKILL)
-                break
-            end
-            sleep(0.005)
-        end
-    end
-    try
-        wait(process)
-    catch err
-        err isa ProcessFailedException || rethrow()
-    end
-    seconds = (time_ns() - started_ns) / 1.0e9
-    rm(pid_file; force = true)
-    ok = !exceeded && process.exitcode == 0
-    return seconds, peak_mb, exceeded, ok
-end
-
-function build_command(impl, input, minsup, ratio, output, jar)
-    if impl == "spmf"
-        java_opts = split(get(ENV, "SPMF_JAVA_OPTS", ""))
-        percent = string(round(ratio * 100; digits = 6)) * "%"
-        return `java $java_opts -jar $jar run $SPMF_ALGORITHM $input $output $percent`
-    end
-    return `$(Base.julia_cmd()) --project=$REPOSITORY_ROOT $(@__FILE__) --worker $impl $input $minsup $output`
-end
 
 "One monitored run. Returns (peak_mb, seconds, itemsets)."
 function measure(impl, input, minsup, ratio, jar)
@@ -172,24 +56,6 @@ function measure(impl, input, minsup, ratio, jar)
     itemsets = count_itemsets(output)
     rm(output; force = true)
     return peak_mb, seconds, itemsets
-end
-
-# --------------------------------------------------------------------------
-# Worker (child process for the Julia implementations)
-# --------------------------------------------------------------------------
-
-function worker()
-    length(ARGS) == 5 || error("Worker usage: --worker IMPL INPUT MINSUP OUTPUT")
-    impl, input, minsup_text, output = ARGS[2:5]
-    minsup = parse(Int, minsup_text)
-    if impl == "basic"
-        mine_file(input; minsup = minsup, output_path = output)
-    elseif impl == "optimized"
-        optimized_available() || error("CharmMining.mine_file_optimized is not defined")
-        CharmMining.mine_file_optimized(input; minsup = minsup, output_path = output)
-    else
-        error("Unknown implementation: $impl")
-    end
 end
 
 # --------------------------------------------------------------------------
@@ -212,25 +78,15 @@ function measure_baselines(impls, jar)
 end
 
 function main()
-    jar = spmf_path()
-    isfile(jar) || error("SPMF jar not found at $jar. Set SPMF_JAR.")
-    Sys.which("java") === nothing && error("Java was not found on PATH.")
-    Sys.islinux() || error("This script reads /proc and only works on Linux.")
-
-    impls = filter(IMPLEMENTATIONS) do impl
-        if impl == "optimized" && !optimized_available()
-            @warn "CharmMining.mine_file_optimized not defined; skipping the optimized implementation"
-            return false
-        end
-        return true
-    end
+    jar = check_environment()
+    impls = IMPLEMENTATIONS
 
     paths = [(name, dataset_path(name)) for name in DATASET_NAMES]
     missing_sets = [name for (name, path) in paths if path === nothing]
     isempty(missing_sets) || error("Missing dataset(s): $(join(missing_sets, ", "))")
 
-    results_path = get(ENV, "MEMORY_RESULTS", joinpath(@__DIR__, "memory_result.csv"))
-    summary_path = get(ENV, "MEMORY_SUMMARY", joinpath(@__DIR__, "memory_summary.csv"))
+    results_path = get(ENV, "MEMORY_RESULTS", joinpath(@__DIR__, "metrics/memory_result.csv"))
+    summary_path = get(ENV, "MEMORY_SUMMARY", joinpath(@__DIR__, "metrics/memory_summary.csv"))
     mkpath(dirname(abspath(results_path)))
 
     baselines = measure_baselines(impls, jar)
@@ -301,5 +157,5 @@ function write_summary(path, summary, order, impls)
 end
 
 if abspath(PROGRAM_FILE) == @__FILE__
-    isempty(ARGS) || first(ARGS) != "--worker" ? main() : worker()
+    main()
 end

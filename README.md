@@ -41,7 +41,6 @@ CharmMining/
 │   ├── repository.jl         # ClosedItemsetRepository & Hash-based Subsumption Checking
 │   ├── engine.jl             # Thuật toán duyệt đệ quy IT-Tree (charm, charm_extend)
 │   ├── pipeline.jl           # Pipeline cấp cao mine_file tích hợp đọc - lọc - khai thác - ghi
-│   ├── save_metrics.jl       # Script đo đạc thực nghiệm (Baseline vs. Optimized) và xuất CSV
 │   └── optimized/            # Module tối ưu hóa (BitVector + Int32 + @simd)
 │       ├── Optimized.jl      # Submodule gom và export các thành phần tối ưu
 │       ├── models.jl         # FastBitTidset (BitVector), FastITNode (Vector{Int32}), BitVerticalDB
@@ -51,11 +50,19 @@ CharmMining/
 │       └── engine.jl         # Vòng lặp đệ quy charm_extend_bit & pipeline mine_file_bit
 ├── data/
 │   ├── toy/                  # CSDL nhỏ kiểm thử nhanh (contextPasquier99.txt)
-│   └── benchmark/            # CSDL benchmark chuẩn FIMI (chess, mushroom, retail, T10I4D100K, accidents)
-├── results/                  # Thư mục lưu kết quả đo lường hiệu năng (.csv)
-│   ├── metrics_minsup.csv    # Metrics thời gian, bộ nhớ, số tập đóng theo minsup
-│   ├── metrics_scalability.csv # Metrics khả năng mở rộng (10% -> 100% dữ liệu)
-│   └── metrics_tx_length.csv # Metrics ảnh hưởng của độ dài giao dịch trung bình
+│   └── benchmark/            # CSDL benchmark chuẩn FIMI (chess, mushrooms, retail, T10I4D100K, accidents)
+├── comparison/               # Benchmark: Basic vs. Optimized vs. SPMF (xem mục "Chạy benchmark")
+│   ├── common.jl             # Mã dùng chung: chạy tiến trình con, đo thời gian & RAM đỉnh
+│   ├── worker.jl             # Tiến trình con chạy bản Julia (basic / optimized)
+│   ├── compare_time.jl       # Đo thời gian theo minsup -> metrics/time_result.csv
+│   ├── compare_memory.jl     # Đo RAM đỉnh -> metrics/memory_result.csv, memory_summary.csv
+│   ├── compare_scalability.jl # Đo khả năng mở rộng -> metrics/scalability_*.csv
+│   ├── plot_time.jl / plot_memory.jl / plot_scalability.jl  # Vẽ biểu đồ SVG -> plots/
+│   ├── run_all.jl            # Chạy toàn bộ benchmark + vẽ biểu đồ
+│   ├── metrics/              # Kết quả (.csv)
+│   └── plots/                # Biểu đồ (.svg)
+├── docs/
+│   └── benchmark.md          # Mô tả tổng quan về benchmark
 └── test/
     ├── runtests.jl           # Master test runner
     ├── test_data.jl          # Unit test: Đọc file, xử lý comment, chuyển đổi VerticalDB
@@ -122,17 +129,58 @@ Kết quả được ghi nhận vào file đầu ra theo đúng chuẩn SPMF (`<
 2 4 #SUP: 2
 ```
 
-### Đo lường và lưu kết quả thực nghiệm (`save_metrics.jl`)
-Để tự động chạy đối chiếu hiệu năng (thời gian thực thi, bộ nhớ cấp phát, khả năng mở rộng) giữa phiên bản cơ bản và phiên bản tối ưu trên toàn bộ các bộ dữ liệu benchmark, thực thi lệnh:
+### Chạy benchmark (`comparison/`)
+Benchmark so sánh hiệu năng của **ba** cài đặt CHARM trên cùng dữ liệu và cùng ngưỡng minsup:
+
+| Tên trong CSV | Cài đặt |
+|---|---|
+| `basic` | Bản cơ bản Julia (`mine_file`) |
+| `optimized` | Bản tối ưu Julia (`mine_file_bit`) |
+| `spmf` | `Charm_bitset` của SPMF (Java) |
+
+**Chuẩn bị:** cần Linux (script đọc `/proc`), Java trên `PATH`, `tools/spmf.jar`, và 5 file dữ liệu trong `data/benchmark/` (xem mục 4), cùng `data/toy/contextPasquier99.txt` (dùng để đo chi phí khởi động).
+
+**Chạy toàn bộ** (đo + vẽ biểu đồ) từ thư mục gốc:
 
 ```bash
-julia --project=. src/save_metrics.jl
+julia --project=. comparison/run_all.jl
 ```
 
-Kết quả đo lường sẽ được xuất trực tiếp ra thư mục `results/` dưới dạng các tệp CSV:
-- `results/metrics_minsup.csv`: Thời gian chạy, lượng RAM cấp phát, hệ số tăng tốc (`speedup`) và số lượng tập đóng qua các ngưỡng `minsup` giảm dần.
-- `results/metrics_scalability.csv`: Khả năng mở rộng của thuật toán khi tăng kích thước CSDL từ `10%` lên `100%` trên `retail.txt` và `accidents.txt`.
-- `results/metrics_tx_length.csv`: Đánh giá mức độ ổn định của phép giao bit khi tăng chiều rộng giao dịch trung bình trên dữ liệu tổng hợp.
+Chạy từng phần: `julia --project=. comparison/run_all.jl time` (hoặc `memory`, `scalability`; có thể ghi nhiều phần). Hoặc chạy trực tiếp từng script:
+
+```bash
+julia --project=. comparison/compare_time.jl
+julia --project=. comparison/plot_time.jl
+```
+
+Chạy thử nhanh trên một bộ dữ liệu:
+
+```bash
+TIME_DATASETS=mushrooms julia --project=. comparison/run_all.jl time
+```
+
+Mỗi lần chạy là một tiến trình riêng, nên thời gian và RAM của ba bản được đo theo cùng một cách.
+
+**Kết quả CSV** trong `comparison/metrics/`:
+- `time_result.csv`: mỗi dòng là một (dataset, minsup, implementation) với `seconds`, `net_seconds` (đã trừ chi phí khởi động Julia/JVM), `peak_mb`, `itemsets`, `status` (`ok`, `mem_exceeded`, `failed`).
+- `memory_result.csv`, `memory_summary.csv`: RAM đỉnh từng lần chạy và trung vị.
+- `scalability_result.csv`, `scalability_summary.csv`, `scalability_analysis.csv`: thời gian/RAM khi tăng kích thước CSDL từ 10% lên 100% và kết luận về độ tăng trưởng.
+
+**Biểu đồ** trong `comparison/plots/`: `<dataset>_runtime.svg`, `<dataset>_itemsets.svg`, `memory_peak.svg`, `memory_net.svg`, `scalability_runtime.svg`, `scalability_loglog.svg`, `scalability_memory.svg`.
+
+**Biến môi trường** (tùy chọn):
+
+| Biến | Ý nghĩa | Mặc định |
+|---|---|---|
+| `SPMF_JAR` | Đường dẫn `spmf.jar` | `tools/spmf.jar` |
+| `SPMF_JAVA_OPTS` | Tham số JVM, ví dụ `-Xmx2g` | trống |
+| `MEMORY_LIMIT_MB` | Dừng tiến trình nếu RAM vượt ngưỡng này | 6000 |
+| `TIME_RUNS` | Số lần lặp mỗi điểm đo thời gian (lấy trung vị) | 1 |
+| `TIME_DATASETS` | Tập con dataset, ví dụ `chess,mushrooms` | tất cả |
+| `MEMORY_RUNS` | Số lần lặp đo RAM | 3 |
+| `SCALABILITY_DATASET`, `SCALABILITY_RATIO`, `SCALABILITY_RUNS` | Cấu hình đo mở rộng | `T10I4D100K`, theo dataset, 3 |
+
+Mô tả chi tiết về cách đo xem tại [`docs/benchmark.md`](docs/benchmark.md).
 
 ---
 
@@ -178,13 +226,13 @@ Do các bộ dữ liệu benchmark có dung lượng lớn và nằm trong `.git
 
 1. **Tải dữ liệu về máy:**
    - **Lựa chọn A (Khuyên dùng - Gói nén của nhóm):** Tải file `benchmark_datasets.zip` đã được chuẩn hóa sẵn tại drive của nhóm.
-   - **Lựa chọn B (Tải trực tiếp từ web gốc):** Truy cập bằng trình duyệt vào [FIMI Repository](http://fimi.uantwerpen.be/data/) hoặc [SPMF Datasets](https://www.philippe-fournier-viger.com/spmf/index.php?link=datasets.php) để tải trực tiếp 5 file dữ liệu (`chess`, `mushroom`, `retail`, `T10I4D100K`, `accidents`).
+   - **Lựa chọn B (Tải trực tiếp từ web gốc):** Truy cập bằng trình duyệt vào [FIMI Repository](http://fimi.uantwerpen.be/data/) hoặc [SPMF Datasets](https://www.philippe-fournier-viger.com/spmf/index.php?link=datasets.php) để tải trực tiếp 5 file dữ liệu (`chess`, `mushrooms`, `retail`, `T10I4D100K`, `accidents`).
 
 2. **Thêm dữ liệu vào thư mục dự án:**
    - Giải nén (nếu dùng Lựa chọn A) hoặc sao chép các file vừa tải vào thư mục `data/benchmark/`.
    - Đảm bảo tên file trong thư mục khớp đúng định dạng:
      - `data/benchmark/chess.txt`
-     - `data/benchmark/mushroom.txt`
+     - `data/benchmark/mushrooms.txt`
      - `data/benchmark/retail.txt`
      - `data/benchmark/T10I4D100K.txt`
      - `data/benchmark/accidents.txt`
@@ -213,7 +261,7 @@ Toàn bộ **201/201 bài test** đều vượt qua (Pass 100%) trên cả phiê
 | Tập dữ liệu | Đặc tính | Số giao dịch (\|D\|) | Ngưỡng minsup | Số tập đóng tìm được | Tỷ lệ khớp với SPMF |
 |---|---|---|---|---|---|
 | **contextPasquier99** | Mẫu nhỏ (Toy) | 9 | 22% (2 txs) | 9 | **100% (9/9)** |
-| **mushroom.txt** | Dense | 8.124 | 30% | 425 | **100% (425/425)** |
+| **mushrooms.txt** | Dense | 8.124 | 30% | 425 | **100% (425/425)** |
 | **chess.txt** | Very Dense | 3.196 | 70% | 23.892 | **100% (23.892/23.892)** |
 | **retail.txt** | Very Sparse | 88.162 | 2% | 55 | **100% (55/55)** |
 | **T10I4D100K.txt** | Sparse tổng hợp | 100.000 | 2% | 155 | **100% (155/155)** |

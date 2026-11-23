@@ -16,7 +16,7 @@ Net runtime is the wall time minus the Julia/JVM start-up baseline.  The plots
 are generated without external Julia packages.
 """
 
-const INPUT_PATH = get(ENV, "SCALABILITY_SUMMARY", joinpath(@__DIR__, "scalability_summary.csv"))
+const INPUT_PATH = get(ENV, "SCALABILITY_SUMMARY", joinpath(@__DIR__, "metrics/scalability_summary.csv"))
 const OUTPUT_DIR = get(ENV, "PLOT_OUTPUT", joinpath(@__DIR__, "plots"))
 
 const IMPLEMENTATIONS = ["basic", "optimized", "spmf"]
