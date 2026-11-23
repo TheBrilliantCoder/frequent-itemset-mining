@@ -36,7 +36,8 @@ end
     execute_test("3. CHARM Properties (1 to 4)",    "test_properties.jl")
     execute_test("4. Repository & Subsumption",      "test_repository.jl")
     execute_test("5. CHARM Engine Integration",     "test_engine.jl")
-    execute_test("6. SPMF Oracle Cross-Validation", "test_oracle.jl")
+    execute_test("6. Optimized CHARM (BitVector)",  "test_optimized.jl")
+    execute_test("7. SPMF Oracle Cross-Validation", "test_oracle.jl")
 end
 
 total_elapsed = round(time() - total_start_time, digits = 2)
