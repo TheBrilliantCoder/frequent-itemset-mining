@@ -4,18 +4,6 @@ using CharmMining
 @testset "CHARM Properties Tests" begin
     minsup = 2
 
-    @testset "Classify Relation" begin
-        t1 = BitSet([1, 2, 3])
-        t2 = BitSet([1, 2, 3])
-        t3 = BitSet([1, 2])
-        t4 = BitSet([2, 3, 4])
-
-        @test classify_relation(t1, t2) == EQUAL
-        @test classify_relation(t3, t1) == LEFT_SUBSET
-        @test classify_relation(t1, t3) == RIGHT_SUBSET
-        @test classify_relation(t3, t4) == INCOMPARABLE
-    end
-
     @testset "Property 1: EQUAL (T(X) == T(Y))" begin
         px = ITPair(Itemset(["1"]), BitSet([1, 2, 3]))
         py = ITPair(Itemset(["2"]), BitSet([1, 2, 3]))

@@ -16,7 +16,7 @@ The implementations that are present in the CSV are plotted, so the
 The plots are generated without external Julia packages.
 """
 
-const INPUT_PATH = get(ENV, "MEMORY_SUMMARY", joinpath(@__DIR__, "memory_summary.csv"))
+const INPUT_PATH = get(ENV, "MEMORY_SUMMARY", joinpath(@__DIR__, "metrics/memory_summary.csv"))
 const OUTPUT_DIR = get(ENV, "PLOT_OUTPUT", joinpath(@__DIR__, "plots"))
 
 # Drawing order, labels and colors of the implementations.

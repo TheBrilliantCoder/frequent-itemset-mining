@@ -1,7 +1,7 @@
 include("src/CharmMining.jl")
 using .CharmMining
 
-input_file = "data/test.txt"
+input_file = "data/toy/test.txt"
 output_file = "output.txt"
 min_support = 10
 

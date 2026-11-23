@@ -22,7 +22,7 @@ export Item, Tid, Itemset, Tidset, VerticalDB, ITPair, ClosedItemset, support
 export load_transactions, to_vertical, frequent_singletons, export_result
 export charm_weight, charm_ordering_key, order_itemsets_charm
 export CharmRelation, EQUAL, LEFT_SUBSET, RIGHT_SUBSET, INCOMPARABLE,
-       classify_relation, combine_nodes, charm_property
+       charm_property
 export ClosedItemsetRepository, tid_checksum, consider!, results
 export charm, charm_extend, run_charm, mine_file
 

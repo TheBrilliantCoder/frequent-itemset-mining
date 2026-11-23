@@ -1,0 +1,4 @@
+dataset,implementation,power_exponent,r2_linear,r2_power,r2_exponential,time_ratio_100_vs_50,verdict
+T10I4D100K,basic,0.0953,0.0613,0.0235,0.0573,3.760,possibly exponential
+T10I4D100K,optimized,-0.1469,0.1369,0.0182,0.0010,0.745,sub-linear (about O(n^-0.15))
+T10I4D100K,spmf,0.2928,0.8237,0.5293,0.7867,1.912,possibly exponential

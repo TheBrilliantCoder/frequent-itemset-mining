@@ -3,7 +3,7 @@ module Properties
 using ..Models
 
 export CharmRelation, EQUAL, LEFT_SUBSET, RIGHT_SUBSET, INCOMPARABLE,
-       CharmPropertyResult, classify_relation, combine_nodes, charm_property
+       CharmPropertyResult, charm_property
 
 """
     CharmRelation
@@ -15,34 +15,6 @@ Enum representing the four possible subset relations between two tidsets.
     LEFT_SUBSET    # t(X) ⊊ t(Y)
     RIGHT_SUBSET   # t(X) ⊋ t(Y)
     INCOMPARABLE   # neither tidset contains the other
-end
-
-"""
-    classify_relation(tx, ty)
-
-Determine the subset relation between tidsets `tx` and `ty`, using length
-checks first to avoid unnecessary subset scans.
-"""
-function classify_relation(tx::Tidset, ty::Tidset)::CharmRelation
-    if tx == ty
-        return EQUAL
-    elseif length(tx) < length(ty) && issubset(tx, ty)
-        return LEFT_SUBSET
-    elseif length(tx) > length(ty) && issubset(ty, tx)
-        return RIGHT_SUBSET
-    else
-        return INCOMPARABLE
-    end
-end
-
-"""
-    combine_nodes(x, y)
-
-Combine two `ITPair`s by taking the union of their items and the intersection
-of their tidsets (`X ∪ Y × (t(X) ∩ t(Y))`).
-"""
-function combine_nodes(x::ITPair, y::ITPair)::ITPair
-    return ITPair(union(x.items, y.items), intersect(x.tids, y.tids))
 end
 
 """

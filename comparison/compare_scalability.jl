@@ -9,8 +9,7 @@ sub-database with the same *relative* minimum support, so the absolute
 `minsup` scales with the database size, as in the usual scalability protocol.
 
   * basic     : Julia implementation without the optimization
-  * optimized : Julia implementation with the optimization
-                (needs `CharmMining.mine_file_optimized`; skipped until it exists)
+  * optimized : Julia implementation with BitVector/SIMD (`mine_file_bit`)
   * spmf      : SPMF `Charm_bitset` reference
 
 Each run is a separate OS process.  Wall-clock time includes the fixed start-up
@@ -32,20 +31,16 @@ Environment variables (all optional):
     MEMORY_LIMIT_MB      kill a run above this RSS (default 6000)
     SPMF_JAR             path to spmf.jar          (default tools/spmf.jar)
     SPMF_JAVA_OPTS       extra JVM flags, e.g. "-Xmx2g"
-    SCALABILITY_RESULTS  detailed CSV   (default comparison/scalability_result.csv)
-    SCALABILITY_SUMMARY  summary CSV    (default comparison/scalability_summary.csv)
-    SCALABILITY_ANALYSIS growth CSV     (default comparison/scalability_analysis.csv)
+    SCALABILITY_RESULTS  detailed CSV   (default comparison/metrics/scalability_result.csv)
+    SCALABILITY_SUMMARY  summary CSV    (default comparison/metrics/scalability_summary.csv)
+    SCALABILITY_ANALYSIS growth CSV     (default comparison/metrics/scalability_analysis.csv)
 """
 
-using Printf
 using Random
-using Statistics
 
-const REPOSITORY_ROOT = normpath(joinpath(@__DIR__, ".."))
+include(joinpath(@__DIR__, "common.jl"))
 
 const FRACTIONS = [0.10, 0.25, 0.50, 0.75, 1.00]
-const IMPLEMENTATIONS = ["basic", "optimized", "spmf"]
-const SPMF_ALGORITHM = "Charm_bitset"
 
 const DATASET = get(ENV, "SCALABILITY_DATASET", "T10I4D100K")
 const DEFAULT_RATIOS = Dict("T10I4D100K" => 0.01, "retail" => 0.01, "accidents" => 0.6,
@@ -54,109 +49,7 @@ const RATIO = parse(Float64, get(ENV, "SCALABILITY_RATIO",
                                  string(get(DEFAULT_RATIOS, DATASET, 0.05))))
 const SEED = parse(Int, get(ENV, "SCALABILITY_SEED", "42"))
 const RUNS = parse(Int, get(ENV, "SCALABILITY_RUNS", "3"))
-const MAX_MEMORY_MB = parse(Float64, get(ENV, "MEMORY_LIMIT_MB", "6000"))
 
-include(joinpath(REPOSITORY_ROOT, "src", "CharmMining.jl"))
-using .CharmMining
-
-# --------------------------------------------------------------------------
-# Helpers
-# --------------------------------------------------------------------------
-
-function dataset_path(name::AbstractString)
-    for path in (
-        joinpath(REPOSITORY_ROOT, "data", "toy", name * ".txt"),
-        joinpath(REPOSITORY_ROOT, "data", name * ".txt"),
-        joinpath(REPOSITORY_ROOT, "data", "benchmark", name * ".txt"),
-    )
-        isfile(path) && return path
-    end
-    return nothing
-end
-
-spmf_path() = begin
-    configured = get(ENV, "SPMF_JAR", "")
-    isempty(configured) ? joinpath(REPOSITORY_ROOT, "tools", "spmf.jar") : abspath(configured)
-end
-
-optimized_available() = isdefined(CharmMining, :mine_file_optimized)
-
-count_itemsets(path) = count(line -> occursin("#SUP:", line), eachline(path))
-
-csv_field(value) = begin
-    text = string(value)
-    occursin(r"[,\"\n]", text) ? '"' * replace(text, '"' => "\"\"") * '"' : text
-end
-
-"Peak RSS (MB) of a running process: VmHWM, falling back to VmRSS."
-function process_peak_mb(pid)
-    status_path = "/proc/$pid/status"
-    isfile(status_path) || return 0.0
-    hwm = 0.0
-    rss = 0.0
-    try
-        for line in eachline(status_path)
-            if startswith(line, "VmHWM:")
-                hwm = parse(Float64, split(line)[2]) / 1024.0
-            elseif startswith(line, "VmRSS:")
-                rss = parse(Float64, split(line)[2]) / 1024.0
-            end
-        end
-    catch
-    end
-    return max(hwm, rss)
-end
-
-"Run `command` and return (seconds, peak_mb, exceeded, ok)."
-function run_monitored(command::Cmd)
-    pid_file = tempname()
-    wrapped_command = Cmd(vcat(
-        ["/bin/sh", "-c", "echo \$\$ > \"$pid_file\"; exec \"\$@\"", "monitored"],
-        command.exec,
-    ))
-    started_ns = time_ns()
-    process = run(wrapped_command; wait = false)
-    pid = nothing
-    while pid === nothing && process_running(process)
-        if isfile(pid_file)
-            pid = tryparse(Int, strip(read(pid_file, String)))
-        end
-        pid === nothing && sleep(0.001)
-    end
-    peak_mb = 0.0
-    exceeded = false
-    if pid !== nothing
-        while process_running(process)
-            current = process_peak_mb(pid)
-            peak_mb = max(peak_mb, current)
-            if current > MAX_MEMORY_MB
-                exceeded = true
-                kill(process, Base.SIGKILL)
-                break
-            end
-            sleep(0.005)
-        end
-    end
-    try
-        wait(process)
-    catch err
-        err isa ProcessFailedException || rethrow()
-    end
-    seconds = (time_ns() - started_ns) / 1.0e9
-    rm(pid_file; force = true)
-    ok = !exceeded && process.exitcode == 0
-    return seconds, peak_mb, exceeded, ok
-end
- 
-function build_command(impl, input, minsup, ratio, output, jar)
-    if impl == "spmf"
-        java_opts = split(get(ENV, "SPMF_JAVA_OPTS", ""))
-        percent = string(round(ratio * 100; digits = 6)) * "%"
-        return `java $java_opts -jar $jar run $SPMF_ALGORITHM $input $output $percent`
-    end
-    return `$(Base.julia_cmd()) --project=$REPOSITORY_ROOT $(@__FILE__) --worker $impl $input $minsup $output`
-end
- 
 "One monitored run. Returns (seconds, peak_mb, itemsets); seconds is NaN if the run was killed."
 function measure(impl, input, minsup, ratio, jar)
     output = tempname() * ".txt"
@@ -173,24 +66,6 @@ function measure(impl, input, minsup, ratio, jar)
     itemsets = count_itemsets(output)
     rm(output; force = true)
     return seconds, peak_mb, itemsets
-end
- 
-# --------------------------------------------------------------------------
-# Worker (child process for the Julia implementations)
-# --------------------------------------------------------------------------
- 
-function worker()
-    length(ARGS) == 5 || error("Worker usage: --worker IMPL INPUT MINSUP OUTPUT")
-    impl, input, minsup_text, output = ARGS[2:5]
-    minsup = parse(Int, minsup_text)
-    if impl == "basic"
-        mine_file(input; minsup = minsup, output_path = output)
-    elseif impl == "optimized"
-        optimized_available() || error("CharmMining.mine_file_optimized is not defined")
-        CharmMining.mine_file_optimized(input; minsup = minsup, output_path = output)
-    else
-        error("Unknown implementation: $impl")
-    end
 end
  
 # --------------------------------------------------------------------------
@@ -299,25 +174,16 @@ function measure_baselines(impls, jar)
 end
 
 function main()
-    jar = spmf_path()
-    isfile(jar) || error("SPMF jar not found at $jar. Set SPMF_JAR.")
-    Sys.which("java") === nothing && error("Java was not found on PATH.")
-    Sys.islinux() || error("This script reads /proc and only works on Linux.")
+    jar = check_environment()
 
     source = dataset_path(DATASET)
     source === nothing && error("Dataset $DATASET not found in data/ or data/benchmark/")
 
-    impls = filter(IMPLEMENTATIONS) do impl
-        if impl == "optimized" && !optimized_available()
-            @warn "CharmMining.mine_file_optimized not defined; skipping the optimized implementation"
-            return false
-        end
-        return true
-    end
+    impls = IMPLEMENTATIONS
 
-    results_path = get(ENV, "SCALABILITY_RESULTS", joinpath(@__DIR__, "scalability_result.csv"))
-    summary_path = get(ENV, "SCALABILITY_SUMMARY", joinpath(@__DIR__, "scalability_summary.csv"))
-    analysis_path = get(ENV, "SCALABILITY_ANALYSIS", joinpath(@__DIR__, "scalability_analysis.csv"))
+    results_path = get(ENV, "SCALABILITY_RESULTS", joinpath(@__DIR__, "metrics/scalability_result.csv"))
+    summary_path = get(ENV, "SCALABILITY_SUMMARY", joinpath(@__DIR__, "metrics/scalability_summary.csv"))
+    analysis_path = get(ENV, "SCALABILITY_ANALYSIS", joinpath(@__DIR__, "metrics/scalability_analysis.csv"))
     mkpath(dirname(abspath(results_path)))
 
     lines = read_transaction_lines(source)
@@ -409,5 +275,5 @@ function write_analysis(path, summary, impls)
 end
 
 if abspath(PROGRAM_FILE) == @__FILE__
-    isempty(ARGS) || first(ARGS) != "--worker" ? main() : worker()
+    main()
 end
