@@ -7,6 +7,9 @@ Manifest.toml
 # Benchmark datasets & external tools
 data/benchmark/*
 !data/benchmark/.gitkeep
+data/applications/*/*.xlsx
+data/applications/*/*.csv
+data/applications/*/*.txt
 *.zip
 tools/spmf.jar
 

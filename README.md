@@ -41,6 +41,7 @@ CharmMining/
 │   ├── repository.jl         # ClosedItemsetRepository & Hash-based Subsumption Checking
 │   ├── engine.jl             # Thuật toán duyệt đệ quy IT-Tree (charm, charm_extend)
 │   ├── pipeline.jl           # Pipeline cấp cao mine_file tích hợp đọc - lọc - khai thác - ghi
+│   ├── rules.jl              # Sinh luật kết hợp chính xác từ tập phổ biến đóng (ClosureSupportIndex)
 │   ├── save_metrics.jl       # Script đo đạc thực nghiệm (Baseline vs. Optimized) và xuất CSV
 │   └── optimized/            # Module tối ưu hóa (BitVector + Int32 + @simd)
 │       ├── Optimized.jl      # Submodule gom và export các thành phần tối ưu
@@ -49,6 +50,16 @@ CharmMining/
 │       ├── properties.jl     # Giao BitVector hai pha (Zero-Allocation) & tái sử dụng vùng nhớ
 │       ├── repository.jl     # Bảng băm 2 tầng với 64-bit XOR checksum & sorted_issubset
 │       └── engine.jl         # Vòng lặp đệ quy charm_extend_bit & pipeline mine_file_bit
+├── applications/
+│   └── market_basket/        # Ứng dụng 1 (Chương 3): Market Basket Analysis trên UCI Online Retail
+│       ├── prepare_data.py   # Tải, làm sạch dữ liệu & chuyển đổi sang SPMF .txt + item_mapping.csv
+│       ├── run_mba.jl        # Khai thác bằng Optimized CHARM & sinh luật kết hợp (Top-10 Lift)
+│       └── plot_mba.py       # Vẽ 4 biểu đồ phân tích độ phân giải cao
+├── notebooks/
+│   └── app1_market_basket.ipynb # Demo notebook (Google Colab / Local) cho Ứng dụng 1
+├── docs/
+│   ├── app1_market_basket.md # Báo cáo & diễn giải kinh doanh cho Ứng dụng 1
+│   └── figures/app1/         # Biểu đồ xuất bản cho báo cáo Ứng dụng 1
 ├── data/
 │   ├── toy/                  # CSDL nhỏ kiểm thử nhanh (contextPasquier99.txt)
 │   └── benchmark/            # CSDL benchmark chuẩn FIMI (chess, mushroom, retail, T10I4D100K, accidents)
@@ -64,6 +75,7 @@ CharmMining/
     ├── test_repository.jl    # Unit test: TID checksum băm và thuật toán consider!
     ├── test_engine.jl        # Integration test: Khai thác trên CSDL Pasquier 1999
     ├── test_optimized.jl     # Unit & Integration test: Kiểm thử toàn diện bản tối ưu & đối chiếu Baseline
+    ├── test_rules.jl         # Unit test: Tra cứu bao đóng & sinh luật kết hợp (Support, Confidence, Lift)
     └── test_oracle.jl        # Oracle test: Đối chuẩn tự động 100% với SPMF trên 5 benchmark
 ```
 
@@ -138,7 +150,7 @@ Kết quả đo lường sẽ được xuất trực tiếp ra thư mục `resul
 
 ## 4. Kiểm thử tự động & Đối chuẩn SPMF (Testing & Verification)
 
-Dự án sở hữu bộ test suite tự động gồm **201 bài kiểm thử**, bao phủ từ các hàm chức năng đơn lẻ của cả hai phiên bản (Baseline và Optimized) cho đến kiểm thử chéo với SPMF.
+Dự án sở hữu bộ test suite tự động gồm **234 bài kiểm thử**, bao phủ từ các hàm chức năng đơn lẻ của cả hai phiên bản (Baseline và Optimized), module sinh luật kết hợp (`src/rules.jl`) cho đến kiểm thử chéo với SPMF.
 
 ### Chuẩn bị SPMF CLI (cho kiểm thử đối chứng)
 
@@ -172,7 +184,7 @@ Tải file thực thi `spmf.jar` vào thư mục `tools/`:
 
 *(Lưu ý: Nếu không có file `tools/spmf.jar`, bài test `test_oracle.jl` sẽ đưa ra cảnh báo và tự động bỏ qua mà không làm gián đoạn các unit test nội bộ khác).*
 
-### Chuẩn bị dữ liệu Benchmark (để chạy đầy đủ 201 test cases)
+### Chuẩn bị dữ liệu Benchmark (để chạy đầy đủ 234 test cases)
 
 Do các bộ dữ liệu benchmark có dung lượng lớn và nằm trong `.gitignore`, bạn có thể chuẩn bị dữ liệu theo các bước sau:
 
@@ -205,10 +217,11 @@ julia --project=. test/runtests.jl
 | `test_repository.jl` | Kiểm tra hàm băm tổng TID ($\sum \text{tid}$), kiểm tra khả năng xử lý va chạm băm và thuật toán `consider!` loại bỏ tập con cùng support. |
 | `test_engine.jl` | Kiểm thử tích hợp thuật toán CHARM trên bộ dữ liệu mẫu Pasquier 1999, xác thực tính đóng (không xuất hiện các tập con thừa). |
 | `test_optimized.jl` | Kiểm thử từng thành phần của bản tối ưu (`BitVerticalDB`, `sorted_union`, `charm_property_bit`, 64-bit XOR checksum) và đối chiếu khớp 100% với bản Baseline. |
+| `test_rules.jl` | Kiểm thử chỉ mục tra cứu bao đóng `ClosureSupportIndex`, tính toán chính xác Support / Confidence / Lift / Leverage / Conviction và khử cặp đối xứng `top_rules_by_lift`. |
 | `test_oracle.jl` | Tự động chạy song song cả hai bản Julia CHARM (`mine_file`, `mine_file_bit`) và `Charm_bitset` của SPMF trên toàn bộ 5 CSDL benchmark, xác thực tỷ lệ khớp 100%. |
 
 ### Kết quả nghiệm thu thực tế với SPMF Oracle
-Toàn bộ **201/201 bài test** đều vượt qua (Pass 100%) trên cả phiên bản Baseline và Optimized:
+Toàn bộ **234/234 bài test** đều vượt qua (Pass 100%) trên cả phiên bản Baseline, Optimized và module Association Rules:
 
 | Tập dữ liệu | Đặc tính | Số giao dịch (\|D\|) | Ngưỡng minsup | Số tập đóng tìm được | Tỷ lệ khớp với SPMF |
 |---|---|---|---|---|---|
@@ -229,4 +242,17 @@ Các tập dữ liệu benchmark được lưu trữ cục bộ trong `data/benc
 
 ---
 
-## 6. Demo Notebooks & Ứng dụng thực tế
+## 6. Demo Notebooks & Ứng dụng thực tế (Chương 3)
+
+### Ứng dụng 1: Phân tích Giỏ hàng (Market Basket Analysis — UCI Online Retail)
+Ứng dụng sử dụng trực tiếp bản **Optimized CHARM (`mine_file_bit`)** cùng module sinh luật kết hợp dựa trên bao đóng Galois (`src/rules.jl`) trên tập dữ liệu bán lẻ thực tế **UCI Online Retail** (19.773 hóa đơn sạch, 3.787 sản phẩm).
+
+- **Pipeline chuẩn bị dữ liệu & khai thác:**
+  ```bash
+  python applications/market_basket/prepare_data.py
+  julia --project=. applications/market_basket/run_mba.jl
+  python applications/market_basket/plot_mba.py
+  ```
+- **Notebook chạy trên Google Colab / Local:** `notebooks/app1_market_basket.ipynb`
+- **Báo cáo phân tích & diễn giải kinh doanh:** `docs/app1_market_basket.md`
+- **Kết quả & biểu đồ:** `results/app1/` (bảng độ nhạy `minsup_sensitivity.csv`, 962 luật tại `minsup = 1.0%`, `minconf = 50%`, Top-10 luật theo Lift và 4 biểu đồ phân tích trong `results/app1/figures/`).
