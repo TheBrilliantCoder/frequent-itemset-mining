@@ -18,6 +18,10 @@ results/
 output*.txt
 *.tmp
 
+# Python bytecode cache
+__pycache__/
+*.py[cod]
+
 # Jupyter Notebook & IDE / OS files
 .ipynb_checkpoints/
 .vscode/
