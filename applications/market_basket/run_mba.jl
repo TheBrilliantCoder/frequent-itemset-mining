@@ -107,6 +107,30 @@ function write_rules_csv(path::AbstractString, rules::Vector{AssociationRule}, m
     end
 end
 
+"""
+Count exact number of all frequent itemsets induced by a set of closed frequent
+itemsets: F = union_{C in Closed} (2^C minus {empty}). Exact by Galois closure.
+"""
+function count_all_frequent_itemsets(closed::Vector{ClosedItemset})::Int
+    all_fi = Set{Vector{String}}()
+    for c in closed
+        k = length(c.items)
+        full_mask = (1 << k) - 1
+        for mask in 1:full_mask
+            sub = Vector{String}(undef, count_ones(mask))
+            idx = 1
+            @inbounds for bit in 0:(k - 1)
+                if (mask & (1 << bit)) != 0
+                    sub[idx] = c.items[bit + 1]
+                    idx += 1
+                end
+            end
+            push!(all_fi, sub)
+        end
+    end
+    return length(all_fi)
+end
+
 function main()
     repo_root = normpath(joinpath(@__DIR__, "..", ".."))
     data_dir = joinpath(repo_root, "data", "applications", "online_retail")
@@ -130,28 +154,38 @@ function main()
     # Warm-up JIT compilation
     _ = charm_bit(db, ceil(Int, 0.05 * n_tx))
 
-    # 1. Minsup sensitivity analysis
+    # 1. Minsup sensitivity analysis (median of 5 runs after JIT warm-up)
     minsup_grid = [0.05, 0.03, 0.025, 0.02, 0.015, 0.01, 0.008]
+    n_repeats = 5
     sens_path = joinpath(results_dir, "minsup_sensitivity.csv")
-    println("\n=== 1. Minsup Sensitivity Analysis (Optimized CHARM) ===")
-    println(@sprintf("%-10s %-10s %-12s %-10s %-12s %-12s", "minsup(%)", "minsup(#)", "Closed(#)", "MaxLen", "Rules(c>=50%)", "Time(ms)"))
+    println("\n=== 1. Minsup Sensitivity Analysis (Optimized CHARM, median of $(n_repeats) runs) ===")
+    println(@sprintf("%-10s %-10s %-10s %-10s %-10s %-12s %-12s", "minsup(%)", "minsup(#)", "Closed(#)", "AllFI(#)", "MaxLen", "Rules(c>=50%)", "Median(ms)"))
 
     open(sens_path, "w") do io
-        println(io, "minsup_pct,minsup_count,num_closed_itemsets,num_closed_len2plus,max_itemset_len,num_rules_conf50,runtime_ms")
+        println(io, "minsup_pct,minsup_count,num_closed_itemsets,num_all_frequent_itemsets,compression_ratio,num_closed_len2plus,max_itemset_len,num_rules_conf50,runtime_ms")
         for ms_pct in minsup_grid
             ms_cnt = ceil(Int, ms_pct * n_tx)
-            t0 = time_ns()
+            # Warm-up run + timed repeats
             closed = charm_bit(db, ms_cnt)
-            elapsed_ms = (time_ns() - t0) / 1e6
+            times_ms = Vector{Float64}(undef, n_repeats)
+            for rep in 1:n_repeats
+                t0 = time_ns()
+                closed = charm_bit(db, ms_cnt)
+                times_ms[rep] = (time_ns() - t0) / 1e6
+            end
+            sort!(times_ms)
+            elapsed_ms = times_ms[cld(n_repeats, 2)]
 
+            all_fi_cnt = count_all_frequent_itemsets(closed)
+            comp_ratio = isempty(closed) ? 1.0 : Float64(all_fi_cnt) / Float64(length(closed))
             len2plus = count(c -> length(c.items) >= 2, closed)
             max_len = isempty(closed) ? 0 : maximum(length(c.items) for c in closed)
             rules = generate_rules(closed, n_tx; minconf = 0.50, minlift = 1.0)
 
-            println(@sprintf("%-10.2f %-10d %-12d %-10d %-12d %-12.2f",
-                ms_pct * 100.0, ms_cnt, length(closed), max_len, length(rules), elapsed_ms))
-            println(io, @sprintf("%.2f,%d,%d,%d,%d,%d,%.3f",
-                ms_pct * 100.0, ms_cnt, length(closed), len2plus, max_len, length(rules), elapsed_ms))
+            println(@sprintf("%-10.2f %-10d %-10d %-10d %-10d %-12d %-12.2f",
+                ms_pct * 100.0, ms_cnt, length(closed), all_fi_cnt, max_len, length(rules), elapsed_ms))
+            println(io, @sprintf("%.2f,%d,%d,%d,%.4f,%d,%d,%d,%.3f",
+                ms_pct * 100.0, ms_cnt, length(closed), all_fi_cnt, comp_ratio, len2plus, max_len, length(rules), elapsed_ms))
         end
     end
 

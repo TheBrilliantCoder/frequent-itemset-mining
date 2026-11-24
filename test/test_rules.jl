@@ -101,4 +101,27 @@ end
             push!(seen, key)
         end
     end
+
+    @testset "Symmetric Lift bitwise equality and higher-Confidence tie-breaking" begin
+        # Reproduce exact counts where (203/237)/(215/19773) vs (203/215)/(237/19773)
+        # previously differed by 1 ULP in IEEE-754 float arithmetic.
+        closed = [
+            ClosedItemset(["A"], 237),
+            ClosedItemset(["B"], 240),
+            ClosedItemset(["C"], 238),
+            ClosedItemset(["A", "B"], 221),
+            ClosedItemset(["A", "C"], 213),
+            ClosedItemset(["B", "C"], 215),
+            ClosedItemset(["A", "B", "C"], 203),
+        ]
+        rules = generate_rules(closed, 19773; minconf = 0.5, minlift = 1.0)
+        r_fwd = only(filter(r -> r.antecedent == ["A"] && r.consequent == ["B", "C"], rules))
+        r_rev = only(filter(r -> r.antecedent == ["B", "C"] && r.consequent == ["A"], rules))
+        @test r_fwd.lift === r_rev.lift
+        @test r_rev.confidence > r_fwd.confidence
+
+        dedup = top_rules_by_lift(rules, 1; deduplicate_symmetric = true)
+        @test dedup[1].antecedent == ["B", "C"]
+        @test dedup[1].consequent == ["A"]
+    end
 end

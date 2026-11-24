@@ -182,7 +182,9 @@ function generate_rules(
             supp_b_count = support_of(index, consequent)
             supp_a = supp_a_count * inv_n
             supp_b = supp_b_count * inv_n
-            lift = conf / supp_b
+            # Compute Lift symmetrically via integer products to prevent IEEE-754 1-ULP
+            # asymmetry between (A => B) and (B => A) during tie-breaking by confidence.
+            lift = Float64(supp_ab_count * n_transactions) / Float64(supp_a_count * supp_b_count)
             lift < minlift && continue
 
             leverage = supp_ab - supp_a * supp_b

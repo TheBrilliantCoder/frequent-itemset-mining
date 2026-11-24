@@ -23,7 +23,7 @@
    - [x] Convert transactions into SPMF `.txt` format and maintain an `item_id -> product_name` mapping dictionary (`item_mapping.csv`).
 
 2. **Mining & Rule Generation**:
-   - [x] Run the group's Optimized CHARM (`CharmMining.mine_file_bit`) across 7 `minsup` thresholds (`5.0%` down to `0.8%`), mining 2,026 closed itemsets in ~71 ms at `minsup = 1.0%`.
+   - [x] Run the group's Optimized CHARM (`CharmMining.mine_file_bit`) across 7 `minsup` thresholds (`5.0%` down to `0.8%`), mining 2,026 closed itemsets in 74.16 ms (median of 5 runs) at `minsup = 1.0%`.
    - [x] Compute exact association metrics via Galois closure support lookup (`ClosureSupportIndex` in `src/rules.jl`):
      - **Support**
      - **Confidence**

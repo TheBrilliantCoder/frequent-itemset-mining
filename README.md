@@ -54,6 +54,7 @@ CharmMining/
 │   └── market_basket/        # Ứng dụng 1 (Chương 3): Market Basket Analysis trên UCI Online Retail
 │       ├── prepare_data.py   # Tải, làm sạch dữ liệu & chuyển đổi sang SPMF .txt + item_mapping.csv
 │       ├── run_mba.jl        # Khai thác bằng Optimized CHARM & sinh luật kết hợp (Top-10 Lift)
+│       ├── posthoc_analysis.py # Kiểm chứng hậu kiểm (Herb Marker 1..6, mùa vụ & in-season Lift, CustomerID)
 │       └── plot_mba.py       # Vẽ 4 biểu đồ phân tích độ phân giải cao
 ├── notebooks/
 │   └── app1_market_basket.ipynb # Demo notebook (Google Colab / Local) cho Ứng dụng 1
@@ -150,7 +151,7 @@ Kết quả đo lường sẽ được xuất trực tiếp ra thư mục `resul
 
 ## 4. Kiểm thử tự động & Đối chuẩn SPMF (Testing & Verification)
 
-Dự án sở hữu bộ test suite tự động gồm **234 bài kiểm thử**, bao phủ từ các hàm chức năng đơn lẻ của cả hai phiên bản (Baseline và Optimized), module sinh luật kết hợp (`src/rules.jl`) cho đến kiểm thử chéo với SPMF.
+Dự án sở hữu bộ test suite tự động gồm **238 bài kiểm thử**, bao phủ từ các hàm chức năng đơn lẻ của cả hai phiên bản (Baseline và Optimized), module sinh luật kết hợp (`src/rules.jl`) cho đến kiểm thử chéo với SPMF.
 
 ### Chuẩn bị SPMF CLI (cho kiểm thử đối chứng)
 
@@ -184,7 +185,7 @@ Tải file thực thi `spmf.jar` vào thư mục `tools/`:
 
 *(Lưu ý: Nếu không có file `tools/spmf.jar`, bài test `test_oracle.jl` sẽ đưa ra cảnh báo và tự động bỏ qua mà không làm gián đoạn các unit test nội bộ khác).*
 
-### Chuẩn bị dữ liệu Benchmark (để chạy đầy đủ 234 test cases)
+### Chuẩn bị dữ liệu Benchmark (để chạy đầy đủ 238 test cases)
 
 Do các bộ dữ liệu benchmark có dung lượng lớn và nằm trong `.gitignore`, bạn có thể chuẩn bị dữ liệu theo các bước sau:
 
@@ -221,7 +222,7 @@ julia --project=. test/runtests.jl
 | `test_oracle.jl` | Tự động chạy song song cả hai bản Julia CHARM (`mine_file`, `mine_file_bit`) và `Charm_bitset` của SPMF trên toàn bộ 5 CSDL benchmark, xác thực tỷ lệ khớp 100%. |
 
 ### Kết quả nghiệm thu thực tế với SPMF Oracle
-Toàn bộ **234/234 bài test** đều vượt qua (Pass 100%) trên cả phiên bản Baseline, Optimized và module Association Rules:
+Toàn bộ **238/238 bài test** đều vượt qua (Pass 100%) trên cả phiên bản Baseline, Optimized và module Association Rules:
 
 | Tập dữ liệu | Đặc tính | Số giao dịch (\|D\|) | Ngưỡng minsup | Số tập đóng tìm được | Tỷ lệ khớp với SPMF |
 |---|---|---|---|---|---|
