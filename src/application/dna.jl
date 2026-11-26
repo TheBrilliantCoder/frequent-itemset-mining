@@ -1,125 +1,87 @@
-const REPOSITORY_SRC  = normpath(joinpath(@__DIR__, ".."))
-const REPOSITORY_ROOT = normpath(joinpath(REPOSITORY_SRC, ".."))
+const REPOSITORY_SRC    = normpath(joinpath(@__DIR__, ".."))
+const REPOSITORY_ROOT   = normpath(joinpath(REPOSITORY_SRC, ".."))
+const CHARM_MODULE_PATH = joinpath(REPOSITORY_SRC, "CharmMining.jl")
+const DATASET_PATH      = joinpath(REPOSITORY_ROOT, "data", "application", "promoters.data")
+const OUTPUT_PATH       = joinpath(REPOSITORY_ROOT, "output", "promoters_charm_output.txt")
 
-const CHARM_MODULE_PATH     = joinpath(REPOSITORY_SRC, "CharmMining.jl")
-const DATASET_PATH          = joinpath(REPOSITORY_ROOT, "data", "application", "human_preprocessed.txt")
-
-# Đường dẫn cho Global Mining
-const GLOBAL_TX_PATH        = joinpath(REPOSITORY_ROOT, "data", "application", "dna_transactions.txt")
-const GLOBAL_OUTPUT_PATH    = joinpath(REPOSITORY_ROOT, "output", "charm_output.txt")
-const GLOBAL_K              = 6
-const GLOBAL_MIN_SUP_RATIO  = 0.30
-
-# Đường dẫn cho Per-Class Mining
-const PER_CLASS_TX_DIR      = joinpath(REPOSITORY_ROOT, "data", "application", "per_class_tx")
-const PER_CLASS_OUTPUT_DIR  = joinpath(REPOSITORY_ROOT, "output", "per_class_charm")
-const PER_CLASS_K           = 8
-const PER_CLASS_MIN_SUP     = 0.15
-
-const VALID_BASES = Set(['A', 'T', 'C', 'G'])
+# Tham số khai phá de novo dựa trên các cụm điểm nóng 
+const MIN_SUPPORT    = 5      # ~9.4% của 53 mẫu mỗi lớp, đủ nhạy để bắt các biến thể 5-mer
+const K_MER_SIZE     = 5      # Phù hợp với độ dài cụm ngắn nhất C2 (8 bp) và lõi motif 5-6 bp
+const VALID_BASES    = Set(['a', 'c', 'g', 't'])
+const CLUSTER_RANGES = [("C1", 3:23), ("C2", 27:34), ("C3", 35:52)]
 
 include(CHARM_MODULE_PATH)
 using .CharmMining
 using Printf
 
-# Hàm hỗ trợ trích xuất k-mer từ một chuỗi DNA
-function extract_kmers(seq::AbstractString, k::Int)::Set{Item}
-    tokens = Set{Item}()
-    for i in 1:(length(seq) - k + 1)
-        kmer = SubString(seq, i, i + k - 1)
-        all(c -> c in VALID_BASES, kmer) && push!(tokens, String(kmer))
-    end
-    return tokens
-end
+"""
+Parse một dòng dữ liệu UCI promoter, trích xuất nhãn lớp và các k-mer trượt
+bên trong từng cụm tọa độ từ CLUSTER_RANGES
+"""
+function parse_promoter_record(line::AbstractString)::Union{Nothing, Vector{String}}
+    fields = split(strip(line), ',')
+    length(fields) >= 3 || return nothing
 
-# 1. Chạy Global Mining (Toàn cục)
-function run_global_mining()
-    mkpath(dirname(GLOBAL_TX_PATH))
-    mkpath(dirname(GLOBAL_OUTPUT_PATH))
+    class = strip(fields[1])
+    class in ("+", "-") || return nothing
 
-    lines = readlines(DATASET_PATH)
-    total_seqs = 0
+    sequence = lowercase(strip(join(fields[3:end], ",")))
+    sequence = filter(!isspace, sequence)
+    length(sequence) == 57 || return nothing
+    all(base -> base in VALID_BASES, sequence) || return nothing
 
-    open(GLOBAL_TX_PATH, "w") do io
-        for line in @view lines[2:end]
-            parts = split(strip(line), '\t')
-            length(parts) < 2 && continue
-            seq, cls = uppercase(parts[1]), "CLASS_" * strip(parts[2])
-            length(seq) < GLOBAL_K && continue
-
-            tokens = extract_kmers(seq, GLOBAL_K)
-            push!(tokens, cls)
-            println(io, join(tokens, " "))
-            total_seqs += 1
+    items = Set{String}(["class=$class"])
+    for (cluster_name, range) in CLUSTER_RANGES
+        start_idx = first(range)
+        end_idx   = last(range) - K_MER_SIZE + 1
+        for i in start_idx:end_idx
+            kmer = sequence[i:(i + K_MER_SIZE - 1)]
+            push!(items, "$(cluster_name)_$(kmer)")
         end
     end
 
-    minsup = ceil(Int, GLOBAL_MIN_SUP_RATIO * total_seqs)
-    println("=== [GLOBAL MINING] k=$GLOBAL_K | Sequences=$total_seqs | minsup=$minsup ===")
-    flush(stdout)
-
-    @time begin
-        transactions = load_transactions(GLOBAL_TX_PATH)
-        db = to_vertical_bit(transactions)
-        closed_itemsets = run_charm_bit(db, minsup)
-        export_result(GLOBAL_OUTPUT_PATH; itemsets = closed_itemsets)
-    end
-
-    motif_patterns = filter(c -> any(it -> !startswith(it, "CLASS_"), c.items), closed_itemsets)
-    println("Tổng số Global Closed Patterns: $(length(motif_patterns))\n")
+    return sort!(collect(items))
 end
 
-# 2. Chạy Per-Class Mining (Tách riêng từng họ protein)
-function run_per_class_mining()
-    mkpath(PER_CLASS_TX_DIR)
-    mkpath(PER_CLASS_OUTPUT_DIR)
+"""
+Chạy thuật toán CHARM và thống kê tách biệt số lượng tập đóng theo từng lớp
+"""
+function run_promoter_mining()
+    isfile(DATASET_PATH) || error("Promoter dataset not found: $DATASET_PATH")
+    transactions = Vector{Vector{String}}()
+    skipped = 0
 
-    lines = readlines(DATASET_PATH)
-    class_seqs = Dict{String, Vector{String}}()
-
-    for line in @view lines[2:end]
-        parts = split(strip(line), '\t')
-        length(parts) < 2 && continue
-        seq, cls = uppercase(parts[1]), "CLASS_" * strip(parts[2])
-        length(seq) < PER_CLASS_K && continue
-        push!(get!(Vector{String}, class_seqs, cls), seq)
-    end
-
-    println("=== [PER-CLASS MINING] k=$PER_CLASS_K | minsup_ratio=$(PER_CLASS_MIN_SUP * 100)% ===")
-    flush(stdout)
-
-    @time for cls in sort!(collect(keys(class_seqs)))
-        seqs = class_seqs[cls]
-        n_seqs = length(seqs)
-        minsup = max(5, ceil(Int, PER_CLASS_MIN_SUP * n_seqs))
-
-        tx_path  = joinpath(PER_CLASS_TX_DIR, "$(cls)_transactions.txt")
-        out_path = joinpath(PER_CLASS_OUTPUT_DIR, "$(cls)_charm_output.txt")
-
-        open(tx_path, "w") do io
-            for seq in seqs
-                tokens = extract_kmers(seq, PER_CLASS_K)
-                println(io, join(tokens, " "))
-            end
+    for line in eachline(DATASET_PATH)
+        record = parse_promoter_record(line)
+        if record === nothing
+            skipped += 1
+        else
+            push!(transactions, record)
         end
-
-        transactions = load_transactions(tx_path)
-        db = to_vertical_bit(transactions)
-        closed_itemsets = run_charm_bit(db, minsup)
-        export_result(out_path; itemsets = closed_itemsets)
-
-        sort!(closed_itemsets, by = c -> (length(c.items), c.support), rev = true)
-        top_sample = isempty(closed_itemsets) ? "None" : join(closed_itemsets[1].items, "+")
-
-        @printf("  %-7s | Seqs=%4d | minsup=%3d | Patterns=%4d | Top motif: %s\n",
-                cls, n_seqs, minsup, length(closed_itemsets), top_sample)
-        flush(stdout)
     end
+
+    isempty(transactions) && error("No valid promoter records found in $DATASET_PATH")
+    minsup = min(MIN_SUPPORT, length(transactions))
+
+    println("=== E. coli De Novo Promoter Mining (CharmBit | k=$K_MER_SIZE) ===")
+    @printf("Records=%d | skipped=%d | clusters=%d | minsup=%d\n",
+            length(transactions), skipped, length(CLUSTER_RANGES), minsup)
+
+    db = to_vertical_bit(transactions)
+    closed_itemsets = run_charm_bit(db, minsup)
+
+    mkpath(dirname(OUTPUT_PATH))
+    export_result(OUTPUT_PATH; itemsets = closed_itemsets)
+
+    pos_patterns = filter(p -> "class=+" in p.items, closed_itemsets)
+    neg_patterns = filter(p -> "class=-" in p.items, closed_itemsets)
+
+    @printf("Total Closed Patterns = %d | class=+ patterns = %d | class=- patterns = %d\n",
+            length(closed_itemsets), length(pos_patterns), length(neg_patterns))
+    println("Results written to $OUTPUT_PATH")
+    return closed_itemsets
 end
 
-function main()
-    run_global_mining()
-    run_per_class_mining()
+if abspath(PROGRAM_FILE) == @__FILE__
+    run_promoter_mining()
 end
-
-main()

@@ -1,0 +1,154 @@
+class=+ #SUP: 53
+class=- #SUP: 53
+C3_gcgcc #SUP: 12
+C3_tgcgc #SUP: 12
+C3_aatgc #SUP: 11
+C3_ataat class=+ #SUP: 11
+C3_atgcg #SUP: 11
+C3_gcgcc class=+ #SUP: 11
+C3_tgcgc class=+ #SUP: 11
+C1_atttt #SUP: 10
+C1_ttgac #SUP: 10
+C3_aatgc class=+ #SUP: 10
+C3_atgcg C3_tgcgc class=+ #SUP: 10
+C3_tataa class=+ #SUP: 10
+C1_caaaa class=+ #SUP: 9
+C1_gcctc class=- #SUP: 9
+C3_aatgc C3_atgcg C3_tgcgc class=+ #SUP: 9
+C3_ataat C3_taatg class=+ #SUP: 9
+C3_ataat C3_tataa class=+ #SUP: 9
+C3_gcgcc C3_tgcgc class=+ #SUP: 9
+C1_aaaaa class=+ #SUP: 8
+C1_atttt class=+ #SUP: 8
+C1_ctcaa #SUP: 8
+C1_cttgt #SUP: 8
+C1_tcaat #SUP: 8
+C1_tcttg #SUP: 8
+C1_tgaac #SUP: 8
+C1_tgctt #SUP: 8
+C1_tgtca #SUP: 8
+C1_ttgac class=+ #SUP: 8
+C1_tttct #SUP: 8
+C1_ttttt class=+ #SUP: 8
+C3_aatgc C3_ataat C3_taatg class=+ #SUP: 8
+C3_aatgc C3_gcgcc class=+ #SUP: 8
+C3_atgcg C3_gcgcc C3_tgcgc class=+ #SUP: 8
+C3_gacgt class=- #SUP: 8
+C3_gcctc #SUP: 8
+C3_tactg #SUP: 8
+C1_aaata #SUP: 7
+C1_aattt class=+ #SUP: 7
+C1_accga class=- #SUP: 7
+C1_acgtt #SUP: 7
+C1_caagg #SUP: 7
+C1_cgctt #SUP: 7
+C1_ctcaa class=- #SUP: 7
+C1_cttgt class=+ #SUP: 7
+C1_gcttg #SUP: 7
+C1_tcaac #SUP: 7
+C1_tcaat class=- #SUP: 7
+C3_aatgc C3_ataat C3_atgcg C3_taatg C3_tgcgc class=+ #SUP: 7
+C3_aatgc C3_ataat C3_gcgcc C3_taatg class=+ #SUP: 7
+C3_aatgc C3_ataat C3_taatg C3_tataa class=+ #SUP: 7
+C3_aatgc C3_atgcg C3_gcgcc C3_tgcgc class=+ #SUP: 7
+C3_ctaac #SUP: 7
+C1_aaaat class=+ #SUP: 6
+C1_aaacg #SUP: 6
+C1_aaata class=+ #SUP: 6
+C1_aacgt #SUP: 6
+C1_aacta #SUP: 6
+C1_acgtt class=- #SUP: 6
+C1_attaa #SUP: 6
+C1_atttt C1_ttttc #SUP: 6
+C1_atttt C1_ttttt class=+ #SUP: 6
+C1_caaca C1_tcaac #SUP: 6
+C1_caaga class=- #SUP: 6
+C1_cctcg #SUP: 6
+C1_cgtct class=- #SUP: 6
+C1_cttga #SUP: 6
+C1_cttgc #SUP: 6
+C1_gcatg #SUP: 6
+C1_gcttg class=+ #SUP: 6
+C1_gcttt #SUP: 6
+C1_gtcag C1_tgtca #SUP: 6
+C1_gttga #SUP: 6
+C1_taaac #SUP: 6
+C1_tcaag class=- #SUP: 6
+C1_tgaac class=- #SUP: 6
+C1_tttct class=+ #SUP: 6
+C3_aatgc C3_ataat C3_atgcg C3_gcgcc C3_taatg C3_tgcgc class=+ #SUP: 6
+C3_aatgc C3_ataat C3_atgcg C3_taatg C3_tataa C3_tgcgc class=+ #SUP: 6
+C3_aatgc C3_ataat C3_gcgcc C3_taatg C3_tataa class=+ #SUP: 6
+C3_atgct #SUP: 6
+C3_cagcc #SUP: 6
+C3_ctata C3_gcgcc C3_tgcgc class=+ #SUP: 6
+C3_gtaaa #SUP: 6
+C3_taacc #SUP: 6
+C3_tactg class=- #SUP: 6
+C3_tagac #SUP: 6
+C3_tgtta #SUP: 6
+C3_ttgta #SUP: 6
+C1_aaaac class=+ #SUP: 5
+C1_aagaa #SUP: 5
+C1_aatat #SUP: 5
+C1_aatca C1_tcaat #SUP: 5
+C1_acgat #SUP: 5
+C1_actac C1_ctacg class=- #SUP: 5
+C1_acttg #SUP: 5
+C1_agcat class=- #SUP: 5
+C1_agcct C1_gcctc class=- #SUP: 5
+C1_atacg #SUP: 5
+C1_atatt class=+ #SUP: 5
+C1_atttt C1_ttttc C1_ttttt class=+ #SUP: 5
+C1_atttt C1_ttttt C3_aatgc class=+ #SUP: 5
+C1_caaca C1_tcaac class=- #SUP: 5
+C1_caaga C3_atgga C3_gacgt class=- #SUP: 5
+C1_caagg class=- #SUP: 5
+C1_caatg #SUP: 5
+C1_ccgct #SUP: 5
+C1_cctcg C1_gcctc class=- #SUP: 5
+C1_cgctt class=+ #SUP: 5
+C1_cttgt C3_tgcgc #SUP: 5
+C1_gaact #SUP: 5
+C1_gacaa #SUP: 5
+C1_gaccg class=- #SUP: 5
+C1_gcatg class=- #SUP: 5
+C1_ggttg #SUP: 5
+C1_gtctc class=- #SUP: 5
+C1_tattc #SUP: 5
+C1_tattt class=+ #SUP: 5
+C1_tcaga #SUP: 5
+C1_tcgac #SUP: 5
+C1_tcttg class=+ #SUP: 5
+C1_tgaca class=+ #SUP: 5
+C1_tgact C1_ttgac #SUP: 5
+C1_tgctt class=+ #SUP: 5
+C1_tgtca class=+ #SUP: 5
+C1_ttatt #SUP: 5
+C1_ttcca #SUP: 5
+C1_ttctt C1_tttct #SUP: 5
+C1_ttgtc class=+ #SUP: 5
+C1_tttat class=+ #SUP: 5
+C1_tttcc #SUP: 5
+C3_aacgc C3_taacg #SUP: 5
+C3_aatgc C3_ataat C3_atgcg C3_cctat C3_ctata C3_gcgcc C3_taatg C3_tataa C3_tgcgc class=+ #SUP: 5
+C3_actgt #SUP: 5
+C3_agacg C3_gacgt class=- #SUP: 5
+C3_agcct #SUP: 5
+C3_ccagc #SUP: 5
+C3_cttgt #SUP: 5
+C3_gcatg #SUP: 5
+C3_gcctc class=+ #SUP: 5
+C3_gtaaa class=+ #SUP: 5
+C3_gtata class=+ #SUP: 5
+C3_tacaa #SUP: 5
+C3_tactg C3_ttact class=- #SUP: 5
+C3_tagaa class=+ #SUP: 5
+C3_tccgt #SUP: 5
+C3_tgaac class=- #SUP: 5
+C3_tgctt #SUP: 5
+C3_tggat class=- #SUP: 5
+C3_tgtaa #SUP: 5
+C3_tgtag #SUP: 5
+C3_tgtga class=- #SUP: 5
+C3_tgtta class=+ #SUP: 5
