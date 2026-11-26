@@ -101,11 +101,12 @@ function run_monitored(command::Cmd)
     process = run(wrapped_command; wait = false)
     pid = nothing
     while pid === nothing && process_running(process)
+        # The shell creates the file before writing the pid, so it can be
+        # briefly empty: retry until a complete number is readable.
         if isfile(pid_file)
-            pid = parse(Int, strip(read(pid_file, String)))
-        else
-            sleep(0.001)
+            pid = tryparse(Int, strip(read(pid_file, String)))
         end
+        pid === nothing && sleep(0.001)
     end
     if pid === nothing
         wait(process)

@@ -16,7 +16,7 @@ Toàn bộ thuật toán được kiểm thử tự động và đối chuẩn k
 
 ### Yêu cầu tiên quyết
 - **Julia**: Phiên bản 1.9 trở lên (đã kiểm thử tương thích tốt trên Julia 1.10 và 1.11+).
-- **Java Runtime Environment (JRE)**: Phiên bản 8 trở lên (chỉ bắt buộc khi chạy module kiểm thử đối chuẩn tự động với SPMF Oracle).
+- **Java Runtime Environment (JRE)**: Phiên bản **25** trở lên (`tools/spmf.jar` được biên dịch cho Java 25; bắt buộc khi chạy kiểm thử đối chuẩn SPMF Oracle và các thực nghiệm Chương 2).
 
 ### Khởi tạo môi trường
 Dự án được tối ưu hóa dựa trên thư viện chuẩn (`Base`) của Julia, không phụ thuộc vào các thư viện FIM bên ngoài. Khởi tạo môi trường dự án bằng lệnh:
