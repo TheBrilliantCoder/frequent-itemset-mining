@@ -6,9 +6,10 @@ from pathlib import Path
 # CẤU HÌNH ĐƯỜNG DẪN (CONSTANTS)
 # ==============================================================================
 REPO_ROOT = Path(__file__).resolve().parents[2]
-DATASET_PATH = REPO_ROOT / "data" / "application" / "human_preprocessed.txt"
-CHARM_OUTPUT_PATH = REPO_ROOT / "output" / "application2_output.txt"
-ANALYSIS_DIR = REPO_ROOT / "output" / "bio_analysis"
+DATASET_PATH = REPO_ROOT / "data" / "applications" / "dna" / "human_preprocessed.txt"
+RESULTS_DIR = REPO_ROOT / "results" / "app2"
+CHARM_OUTPUT_PATH = RESULTS_DIR / "global_closed_itemsets_k6.txt"
+ANALYSIS_DIR = RESULTS_DIR / "bio_analysis"
 
 CLASS_NAMES = {
     "CLASS_0": "G protein-coupled receptors (GPCRs)",
@@ -46,7 +47,7 @@ HYDROPHOBIC_AA = {"A", "V", "I", "L", "M", "F", "Y", "W"}
 # CÁC HÀM PHÂN TÍCH SINH HỌC & THỐNG KÊ
 # ==============================================================================
 def load_dataset(dataset_path: Path):
-    """Đọc human.txt và tính phân bố gốc của 7 họ protein."""
+    """Đọc human_preprocessed.txt và tính phân bố gốc của 7 họ protein."""
     records = []
     class_counts = Counter()
 
@@ -67,7 +68,7 @@ def load_dataset(dataset_path: Path):
 
 
 def parse_charm_output(charm_path: Path):
-    """Đọc file application2_output.txt chuẩn SPMF."""
+    """Đọc file kết quả CHARM toàn cục (chuẩn SPMF)."""
     closed_sets = []
     with charm_path.open("r", encoding="utf-8") as f:
         for line in f:
@@ -197,7 +198,7 @@ def analyze_biochemistry(contigs: list[str]):
 def main():
     ANALYSIS_DIR.mkdir(parents=True, exist_ok=True)
 
-    print("1. Đang tải dữ liệu gốc human.txt...")
+    print("1. Đang tải dữ liệu đã tiền xử lý human_preprocessed.txt...")
     records, class_counts, class_probs = load_dataset(DATASET_PATH)
     total_seqs = len(records)
 
@@ -208,7 +209,7 @@ def main():
             f"{class_counts[cls]:4d} chuỗi ({class_probs[cls]*100:5.2f}%)"
         )
 
-    print("\n2. Đang phân tích kết quả từ application2_output.txt...")
+    print(f"\n2. Đang phân tích kết quả từ {CHARM_OUTPUT_PATH.name}...")
     closed_sets = parse_charm_output(CHARM_OUTPUT_PATH)
 
     class_specific_rows = []

@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="600" viewBox="0 0 900 600">
+<rect width="100%" height="100%" fill="white"/>
+<text x="450" y="28" text-anchor="middle" font-family="sans-serif" font-size="20">Runtime: retail</text>
+<line x1="90" y1="55" x2="90" y2="520" stroke="black"/>
+<line x1="90" y1="520" x2="870" y2="520" stroke="black"/>
+<line x1="90" y1="520.0" x2="870" y2="520.0" stroke="#dddddd"/>
+<text x="82" y="524.0" text-anchor="end" font-family="sans-serif" font-size="12">0.0</text>
+<line x1="90" y1="427.0" x2="870" y2="427.0" stroke="#dddddd"/>
+<text x="82" y="431.0" text-anchor="end" font-family="sans-serif" font-size="12">0.63</text>
+<line x1="90" y1="334.0" x2="870" y2="334.0" stroke="#dddddd"/>
+<text x="82" y="338.0" text-anchor="end" font-family="sans-serif" font-size="12">1.26</text>
+<line x1="90" y1="241.0" x2="870" y2="241.0" stroke="#dddddd"/>
+<text x="82" y="245.0" text-anchor="end" font-family="sans-serif" font-size="12">1.89</text>
+<line x1="90" y1="148.0" x2="870" y2="148.0" stroke="#dddddd"/>
+<text x="82" y="152.0" text-anchor="end" font-family="sans-serif" font-size="12">2.52</text>
+<line x1="90" y1="55.0" x2="870" y2="55.0" stroke="#dddddd"/>
+<text x="82" y="59.0" text-anchor="end" font-family="sans-serif" font-size="12">3.15</text>
+<text x="90.0" y="542" text-anchor="middle" font-family="sans-serif" font-size="12">10.0%</text>
+<text x="220.0" y="542" text-anchor="middle" font-family="sans-serif" font-size="12">8.0%</text>
+<text x="350.0" y="542" text-anchor="middle" font-family="sans-serif" font-size="12">6.0%</text>
+<text x="480.0" y="542" text-anchor="middle" font-family="sans-serif" font-size="12">4.0%</text>
+<text x="610.0" y="542" text-anchor="middle" font-family="sans-serif" font-size="12">2.0%</text>
+<text x="740.0" y="542" text-anchor="middle" font-family="sans-serif" font-size="12">1.0%</text>
+<text x="870.0" y="542" text-anchor="middle" font-family="sans-serif" font-size="12">0.5%</text>
+<polyline points="90.0,89.45450137972733 220.0,87.07904390961802 350.0,85.8838676593045 480.0,66.74221814035499 610.0,85.27003359884537 740.0,86.46110256099865 870.0,55.0" fill="none" stroke="#1565c0" stroke-width="3"/>
+<polyline points="90.0,415.36702612444253 220.0,415.1776400997737 350.0,413.1987857655208 480.0,408.3877213337517 610.0,413.23391194845703 740.0,411.71300215126075 870.0,411.57864985921526" fill="none" stroke="#d84315" stroke-width="3"/>
+<circle cx="90.0" cy="89.45450137972733" r="5" fill="white" stroke="#1565c0" stroke-width="2"/>
+<rect x="85.0" y="410.36702612444253" width="10" height="10" fill="white" stroke="#d84315" stroke-width="2"/>
+<circle cx="220.0" cy="87.07904390961802" r="5" fill="white" stroke="#1565c0" stroke-width="2"/>
+<rect x="215.0" y="410.1776400997737" width="10" height="10" fill="white" stroke="#d84315" stroke-width="2"/>
+<circle cx="350.0" cy="85.8838676593045" r="5" fill="white" stroke="#1565c0" stroke-width="2"/>
+<rect x="345.0" y="408.1987857655208" width="10" height="10" fill="white" stroke="#d84315" stroke-width="2"/>
+<circle cx="480.0" cy="66.74221814035499" r="5" fill="white" stroke="#1565c0" stroke-width="2"/>
+<rect x="475.0" y="403.3877213337517" width="10" height="10" fill="white" stroke="#d84315" stroke-width="2"/>
+<circle cx="610.0" cy="85.27003359884537" r="5" fill="white" stroke="#1565c0" stroke-width="2"/>
+<rect x="605.0" y="408.23391194845703" width="10" height="10" fill="white" stroke="#d84315" stroke-width="2"/>
+<circle cx="740.0" cy="86.46110256099865" r="5" fill="white" stroke="#1565c0" stroke-width="2"/>
+<rect x="735.0" y="406.71300215126075" width="10" height="10" fill="white" stroke="#d84315" stroke-width="2"/>
+<circle cx="870.0" cy="55.0" r="5" fill="white" stroke="#1565c0" stroke-width="2"/>
+<rect x="865.0" y="406.57864985921526" width="10" height="10" fill="white" stroke="#d84315" stroke-width="2"/>
+<polyline points="90.0,78.06042690311781 220.0,80.59935175392889 350.0,77.23084124482827 480.0,65.06168210177094 610.0,78.06030593979648 740.0,82.7184916385239 870.0,81.28194467463726" fill="none" stroke="#2e7d32" stroke-width="3" stroke-dasharray="8 4"/>
+<polygon points="90.0,72.06042690311781 96.0,78.06042690311781 90.0,84.06042690311781 84.0,78.06042690311781" fill="white" stroke="#2e7d32" stroke-width="2"/>
+<polygon points="220.0,74.59935175392889 226.0,80.59935175392889 220.0,86.59935175392889 214.0,80.59935175392889" fill="white" stroke="#2e7d32" stroke-width="2"/>
+<polygon points="350.0,71.23084124482827 356.0,77.23084124482827 350.0,83.23084124482827 344.0,77.23084124482827" fill="white" stroke="#2e7d32" stroke-width="2"/>
+<polygon points="480.0,59.06168210177094 486.0,65.06168210177094 480.0,71.06168210177094 474.0,65.06168210177094" fill="white" stroke="#2e7d32" stroke-width="2"/>
+<polygon points="610.0,72.06030593979648 616.0,78.06030593979648 610.0,84.06030593979648 604.0,78.06030593979648" fill="white" stroke="#2e7d32" stroke-width="2"/>
+<polygon points="740.0,76.7184916385239 746.0,82.7184916385239 740.0,88.7184916385239 734.0,82.7184916385239" fill="white" stroke="#2e7d32" stroke-width="2"/>
+<polygon points="870.0,75.28194467463726 876.0,81.28194467463726 870.0,87.28194467463726 864.0,81.28194467463726" fill="white" stroke="#2e7d32" stroke-width="2"/>
+<text x="450" y="582" text-anchor="middle" font-family="sans-serif">Minimum support (high to low)</text>
+<text transform="translate(18 300) rotate(-90)" text-anchor="middle" font-family="sans-serif">Runtime (seconds)</text>
+<line x1="680" y1="35" x2="705" y2="35" stroke="#1565c0" stroke-width="3"/><text x="712" y="39" font-family="sans-serif">Basic</text>
+<line x1="560" y1="35" x2="585" y2="35" stroke="#2e7d32" stroke-width="3"/><text x="592" y="39" font-family="sans-serif">Optimized</text>
+<line x1="780" y1="35" x2="805" y2="35" stroke="#d84315" stroke-width="3"/><text x="812" y="39" font-family="sans-serif">SPMF</text>
+</svg>

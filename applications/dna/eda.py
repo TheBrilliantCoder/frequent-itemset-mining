@@ -6,8 +6,9 @@ from pathlib import Path
 # CẤU HÌNH ĐƯỜNG DẪN & THAM SỐ (CONSTANTS)
 # ==============================================================================
 REPO_ROOT = Path(__file__).resolve().parents[2]
-RAW_DATASET_PATH = REPO_ROOT / "data" / "application" / "human.txt"
-PREPROCESSED_DATASET_PATH = REPO_ROOT / "data" / "application" / "human_preprocessed.txt"
+DATA_DIR = REPO_ROOT / "data" / "applications" / "dna"
+RAW_DATASET_PATH = DATA_DIR / "human.txt"
+PREPROCESSED_DATASET_PATH = DATA_DIR / "human_preprocessed.txt"
 
 MIN_SEQ_LEN = 50
 MAX_SEQ_LEN = 10000

@@ -2,7 +2,7 @@
 
 ## 1. Phạm vi và cách đọc kết quả
 
-Báo cáo này diễn giải các pattern được tìm thấy trong `output/`. Phân tích gồm kết quả CHARM toàn cục và kết quả chạy riêng cho bảy nhãn `CLASS_0`–`CLASS_6`. Trong CSV toàn cục, mỗi hàng mô tả một tập k-mer đóng cùng support và một số đặc trưng trình tự được tính từ motif đã ghép.
+Báo cáo này diễn giải các pattern được tìm thấy trong `results/app2/` (sinh bởi pipeline `applications/dna/`). Phân tích gồm kết quả CHARM toàn cục và kết quả chạy riêng cho bảy nhãn `CLASS_0`–`CLASS_6`. Trong CSV toàn cục, mỗi hàng mô tả một tập k-mer đóng cùng support và một số đặc trưng trình tự được tính từ motif đã ghép.
 
 Support là số chuỗi trong tập phân tích có chứa pattern; `support_pct` là tỷ lệ trên toàn bộ tập đó. Đây là mức phổ biến, không tự nó cho biết pattern đặc hiệu cho một lớp hay có vai trò sinh học. Các file per-class hiện có motif và `#SUP`; chúng không có mẫu số lớp, confidence, lift hoặc kiểm định thống kê. Vì vậy, các pattern theo lớp dưới đây được xem là ứng viên để khảo sát, chưa phải biomarker đã xác nhận.
 

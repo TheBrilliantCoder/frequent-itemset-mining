@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="600" viewBox="0 0 900 600">
+<rect width="100%" height="100%" fill="white"/>
+<text x="450" y="28" text-anchor="middle" font-family="sans-serif" font-size="20">Runtime vs database size (log-log): T10I4D100K</text>
+<line x1="90" y1="520.0" x2="870" y2="520.0" stroke="#dddddd"/>
+<text x="82" y="524.0" text-anchor="end" font-family="sans-serif" font-size="12">0.01</text>
+<line x1="90" y1="295.0" x2="870" y2="295.0" stroke="#dddddd"/>
+<text x="82" y="299.0" text-anchor="end" font-family="sans-serif" font-size="12">0.1</text>
+<line x1="90" y1="70.0" x2="870" y2="70.0" stroke="#dddddd"/>
+<text x="82" y="74.0" text-anchor="end" font-family="sans-serif" font-size="12">1.0</text>
+<line x1="143.7931034482759" y1="70" x2="143.7931034482759" y2="520" stroke="#eeeeee"/>
+<text x="143.7931034482759" y="542" text-anchor="middle" font-family="sans-serif" font-size="12">10000</text>
+<line x1="411.3734541070597" y1="70" x2="411.3734541070597" y2="520" stroke="#eeeeee"/>
+<text x="411.3734541070597" y="542" text-anchor="middle" font-family="sans-serif" font-size="12">25000</text>
+<line x1="613.7901753293919" y1="70" x2="613.7901753293919" y2="520" stroke="#eeeeee"/>
+<text x="613.7901753293919" y="542" text-anchor="middle" font-family="sans-serif" font-size="12">50000</text>
+<line x1="732.1963667633845" y1="70" x2="732.1963667633845" y2="520" stroke="#eeeeee"/>
+<text x="732.1963667633845" y="542" text-anchor="middle" font-family="sans-serif" font-size="12">75000</text>
+<line x1="816.2068965517241" y1="70" x2="816.2068965517241" y2="520" stroke="#eeeeee"/>
+<text x="816.2068965517241" y="542" text-anchor="middle" font-family="sans-serif" font-size="12">100000</text>
+<line x1="90" y1="70" x2="90" y2="520" stroke="black"/>
+<line x1="90" y1="520" x2="870" y2="520" stroke="black"/>
+<polyline points="143.7931034482759,258.3934427485766 411.3734541070597,246.088619494105 613.7901753293919,135.94704075291452 732.1963667633845,113.30020480990723 816.2068965517241,96.49500898138236" fill="none" stroke="#1565c0" stroke-width="3"/>
+<circle cx="143.7931034482759" cy="258.3934427485766" r="5" fill="white" stroke="#1565c0" stroke-width="2"/>
+<circle cx="411.3734541070597" cy="246.088619494105" r="5" fill="white" stroke="#1565c0" stroke-width="2"/>
+<circle cx="613.7901753293919" cy="135.94704075291452" r="5" fill="white" stroke="#1565c0" stroke-width="2"/>
+<circle cx="732.1963667633845" cy="113.30020480990723" r="5" fill="white" stroke="#1565c0" stroke-width="2"/>
+<circle cx="816.2068965517241" cy="96.49500898138236" r="5" fill="white" stroke="#1565c0" stroke-width="2"/>
+<polyline points="143.7931034482759,352.5235154485493 411.3734541070597,288.1451197104716 613.7901753293919,183.57279262811494 732.1963667633845,136.63877199337324 816.2068965517241,156.92530280633932" fill="none" stroke="#2e7d32" stroke-width="3"/>
+<circle cx="143.7931034482759" cy="352.5235154485493" r="5" fill="white" stroke="#2e7d32" stroke-width="2"/>
+<circle cx="411.3734541070597" cy="288.1451197104716" r="5" fill="white" stroke="#2e7d32" stroke-width="2"/>
+<circle cx="613.7901753293919" cy="183.57279262811494" r="5" fill="white" stroke="#2e7d32" stroke-width="2"/>
+<circle cx="732.1963667633845" cy="136.63877199337324" r="5" fill="white" stroke="#2e7d32" stroke-width="2"/>
+<circle cx="816.2068965517241" cy="156.92530280633932" r="5" fill="white" stroke="#2e7d32" stroke-width="2"/>
+<polyline points="143.7931034482759,367.612366651113 411.3734541070597,298.870970032678 613.7901753293919,280.3967604037149 732.1963667633845,225.13319464981248 816.2068965517241,230.05741673908508" fill="none" stroke="#d84315" stroke-width="3"/>
+<circle cx="143.7931034482759" cy="367.612366651113" r="5" fill="white" stroke="#d84315" stroke-width="2"/>
+<circle cx="411.3734541070597" cy="298.870970032678" r="5" fill="white" stroke="#d84315" stroke-width="2"/>
+<circle cx="613.7901753293919" cy="280.3967604037149" r="5" fill="white" stroke="#d84315" stroke-width="2"/>
+<circle cx="732.1963667633845" cy="225.13319464981248" r="5" fill="white" stroke="#d84315" stroke-width="2"/>
+<circle cx="816.2068965517241" cy="230.05741673908508" r="5" fill="white" stroke="#d84315" stroke-width="2"/>
+<text x="450" y="582" text-anchor="middle" font-family="sans-serif">Number of transactions (log scale)</text>
+<text transform="translate(18 300) rotate(-90)" text-anchor="middle" font-family="sans-serif">Net runtime (seconds, log scale)</text>
+<line x1="794" y1="35" x2="819" y2="35" stroke="#d84315" stroke-width="3"/><text x="826" y="39" font-family="sans-serif">SPMF</text>
+<line x1="673" y1="35" x2="698" y2="35" stroke="#2e7d32" stroke-width="3"/><text x="705" y="39" font-family="sans-serif">Optimized</text>
+<line x1="588" y1="35" x2="613" y2="35" stroke="#1565c0" stroke-width="3"/><text x="620" y="39" font-family="sans-serif">Basic</text>
+</svg>

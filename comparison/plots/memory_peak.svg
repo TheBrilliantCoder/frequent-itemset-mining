@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="600" viewBox="0 0 1000 600">
+<rect width="100%" height="100%" fill="white"/>
+<text x="500" y="28" text-anchor="middle" font-family="sans-serif" font-size="20">Peak memory (RSS) at median minsup</text>
+<line x1="90" y1="510.0" x2="970" y2="510.0" stroke="#dddddd"/>
+<text x="82" y="514.0" text-anchor="end" font-family="sans-serif" font-size="12">0.0</text>
+<line x1="90" y1="422.0" x2="970" y2="422.0" stroke="#dddddd"/>
+<text x="82" y="426.0" text-anchor="end" font-family="sans-serif" font-size="12">200</text>
+<line x1="90" y1="334.0" x2="970" y2="334.0" stroke="#dddddd"/>
+<text x="82" y="338.0" text-anchor="end" font-family="sans-serif" font-size="12">400</text>
+<line x1="90" y1="246.0" x2="970" y2="246.0" stroke="#dddddd"/>
+<text x="82" y="250.0" text-anchor="end" font-family="sans-serif" font-size="12">600</text>
+<line x1="90" y1="158.0" x2="970" y2="158.0" stroke="#dddddd"/>
+<text x="82" y="162.0" text-anchor="end" font-family="sans-serif" font-size="12">800</text>
+<line x1="90" y1="70.0" x2="970" y2="70.0" stroke="#dddddd"/>
+<text x="82" y="74.0" text-anchor="end" font-family="sans-serif" font-size="12">1000</text>
+<line x1="90" y1="70" x2="90" y2="510" stroke="black"/>
+<line x1="90" y1="510" x2="970" y2="510" stroke="black"/>
+<rect x="109.6" y="331.9584" width="42.93333333333334" height="178.04160000000002" fill="#1565c0"/>
+<text x="131.06666666666666" y="325.9584" text-anchor="middle" font-family="sans-serif" font-size="11">405</text>
+<rect x="156.53333333333333" y="349.1756" width="42.93333333333334" height="160.82440000000003" fill="#2e7d32"/>
+<text x="178.0" y="343.1756" text-anchor="middle" font-family="sans-serif" font-size="11">366</text>
+<rect x="203.46666666666667" y="445.76" width="42.93333333333334" height="64.24000000000001" fill="#d84315"/>
+<text x="224.93333333333334" y="439.76" text-anchor="middle" font-family="sans-serif" font-size="11">146</text>
+<text x="178.0" y="532" text-anchor="middle" font-family="sans-serif" font-size="13">chess</text>
+<text x="178.0" y="549" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#555555">minsup 65.0%</text>
+<rect x="285.6" y="359.83239999999995" width="42.93333333333334" height="150.16760000000005" fill="#1565c0"/>
+<text x="307.0666666666667" y="353.83239999999995" text-anchor="middle" font-family="sans-serif" font-size="11">341</text>
+<rect x="332.53333333333336" y="359.7444" width="42.93333333333334" height="150.25560000000002" fill="#2e7d32"/>
+<text x="354.0" y="353.7444" text-anchor="middle" font-family="sans-serif" font-size="11">341</text>
+<rect x="379.4666666666667" y="462.58119999999997" width="42.93333333333334" height="47.41880000000003" fill="#d84315"/>
+<text x="400.9333333333334" y="456.58119999999997" text-anchor="middle" font-family="sans-serif" font-size="11">108</text>
+<text x="354.0" y="532" text-anchor="middle" font-family="sans-serif" font-size="13">mushrooms</text>
+<text x="354.0" y="549" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#555555">minsup 35.0%</text>
+<rect x="461.6" y="292.6268" width="42.93333333333334" height="217.3732" fill="#1565c0"/>
+<text x="483.0666666666667" y="286.6268" text-anchor="middle" font-family="sans-serif" font-size="11">494</text>
+<rect x="508.53333333333336" y="274.64840000000004" width="42.93333333333334" height="235.35159999999996" fill="#2e7d32"/>
+<text x="530.0" y="268.64840000000004" text-anchor="middle" font-family="sans-serif" font-size="11">535</text>
+<rect x="555.4666666666667" y="73.1988" width="42.93333333333334" height="436.8012" fill="#d84315"/>
+<text x="576.9333333333334" y="67.1988" text-anchor="middle" font-family="sans-serif" font-size="11">993</text>
+<text x="530.0" y="532" text-anchor="middle" font-family="sans-serif" font-size="13">retail</text>
+<text x="530.0" y="549" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#555555">minsup 4.0%</text>
+<rect x="637.6" y="335.63239999999996" width="42.93333333333334" height="174.36760000000004" fill="#1565c0"/>
+<text x="659.0666666666667" y="329.63239999999996" text-anchor="middle" font-family="sans-serif" font-size="11">396</text>
+<rect x="684.5333333333333" y="344.6172" width="42.93333333333334" height="165.38279999999997" fill="#2e7d32"/>
+<text x="706.0" y="338.6172" text-anchor="middle" font-family="sans-serif" font-size="11">376</text>
+<rect x="731.4666666666667" y="416.6276" width="42.93333333333334" height="93.37240000000003" fill="#d84315"/>
+<text x="752.9333333333334" y="410.6276" text-anchor="middle" font-family="sans-serif" font-size="11">212</text>
+<text x="706.0" y="532" text-anchor="middle" font-family="sans-serif" font-size="13">T10I4D100K</text>
+<text x="706.0" y="549" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#555555">minsup 4.0%</text>
+<rect x="813.6" y="86.28000000000002" width="42.93333333333334" height="423.71999999999997" fill="#1565c0"/>
+<text x="835.0666666666667" y="80.28000000000002" text-anchor="middle" font-family="sans-serif" font-size="11">963</text>
+<rect x="860.5333333333333" y="79.60080000000002" width="42.93333333333334" height="430.39919999999995" fill="#2e7d32"/>
+<text x="882.0" y="73.60080000000002" text-anchor="middle" font-family="sans-serif" font-size="11">978</text>
+<rect x="907.4666666666667" y="255.152" width="42.93333333333334" height="254.848" fill="#d84315"/>
+<text x="928.9333333333334" y="249.152" text-anchor="middle" font-family="sans-serif" font-size="11">579</text>
+<text x="882.0" y="532" text-anchor="middle" font-family="sans-serif" font-size="13">accidents</text>
+<text x="882.0" y="549" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#555555">minsup 65.0%</text>
+<text x="500" y="582" text-anchor="middle" font-family="sans-serif">Dataset</text>
+<text transform="translate(18 300) rotate(-90)" text-anchor="middle" font-family="sans-serif">Peak memory (MB)</text>
+<rect x="904" y="28" width="14" height="14" fill="#d84315"/>
+<text x="924" y="40" font-family="sans-serif" font-size="13">SPMF</text>
+<rect x="793" y="28" width="14" height="14" fill="#2e7d32"/>
+<text x="813" y="40" font-family="sans-serif" font-size="13">Optimized</text>
+<rect x="718" y="28" width="14" height="14" fill="#1565c0"/>
+<text x="738" y="40" font-family="sans-serif" font-size="13">Basic</text>
+</svg>

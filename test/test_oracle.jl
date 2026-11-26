@@ -61,7 +61,7 @@ end
         # Ngưỡng minsup được chọn tối ưu để test nhanh mà vẫn sinh đủ không gian mẫu đóng
         benchmark_dir = joinpath(@__DIR__, "..", "data", "benchmark")
         benchmark_tests = [
-            ("mushroom.txt",   0.3,  "30%"),   # Dense, trung bình
+            ("mushrooms.txt",  0.3,  "30%"),   # Dense, trung bình
             ("chess.txt",      0.7,  "70%"),   # Very Dense, itemset dài
             ("retail.txt",     0.02, "2%"),    # Very Sparse, thực tế (88k tx)
             ("T10I4D100K.txt", 0.02, "2%"),    # Sparse, tổng hợp (100k tx)

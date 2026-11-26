@@ -1,18 +1,19 @@
-const REPOSITORY_SRC  = normpath(joinpath(@__DIR__, ".."))
-const REPOSITORY_ROOT = normpath(joinpath(REPOSITORY_SRC, ".."))
+const REPOSITORY_ROOT = normpath(joinpath(@__DIR__, "..", ".."))
+const DATA_DIR        = joinpath(REPOSITORY_ROOT, "data", "applications", "dna")
+const RESULTS_DIR     = joinpath(REPOSITORY_ROOT, "results", "app2")
 
-const CHARM_MODULE_PATH     = joinpath(REPOSITORY_SRC, "CharmMining.jl")
-const DATASET_PATH          = joinpath(REPOSITORY_ROOT, "data", "application", "human_preprocessed.txt")
+const CHARM_MODULE_PATH     = joinpath(REPOSITORY_ROOT, "src", "CharmMining.jl")
+const DATASET_PATH          = joinpath(DATA_DIR, "human_preprocessed.txt")
 
 # Đường dẫn cho Global Mining
-const GLOBAL_TX_PATH        = joinpath(REPOSITORY_ROOT, "data", "application", "dna_transactions.txt")
-const GLOBAL_OUTPUT_PATH    = joinpath(REPOSITORY_ROOT, "output", "charm_output.txt")
+const GLOBAL_TX_PATH        = joinpath(DATA_DIR, "transactions_global_k6.txt")
+const GLOBAL_OUTPUT_PATH    = joinpath(RESULTS_DIR, "global_closed_itemsets_k6.txt")
 const GLOBAL_K              = 6
 const GLOBAL_MIN_SUP_RATIO  = 0.30
 
 # Đường dẫn cho Per-Class Mining
-const PER_CLASS_TX_DIR      = joinpath(REPOSITORY_ROOT, "data", "application", "per_class_tx")
-const PER_CLASS_OUTPUT_DIR  = joinpath(REPOSITORY_ROOT, "output", "per_class_charm")
+const PER_CLASS_TX_DIR      = joinpath(DATA_DIR, "per_class_tx")
+const PER_CLASS_OUTPUT_DIR  = joinpath(RESULTS_DIR, "per_class_charm")
 const PER_CLASS_K           = 8
 const PER_CLASS_MIN_SUP     = 0.15
 
