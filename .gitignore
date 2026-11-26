@@ -7,6 +7,9 @@ Manifest.toml
 # Benchmark datasets & external tools
 data/benchmark/*
 !data/benchmark/.gitkeep
+data/applications/*/*.xlsx
+data/applications/*/*.csv
+data/applications/*/*.txt
 *.zip
 tools/spmf.jar
 
@@ -14,6 +17,10 @@ tools/spmf.jar
 results/
 output*.txt
 *.tmp
+
+# Python bytecode cache
+__pycache__/
+*.py[cod]
 
 # Jupyter Notebook & IDE / OS files
 .ipynb_checkpoints/
