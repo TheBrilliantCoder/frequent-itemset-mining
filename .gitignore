@@ -7,13 +7,23 @@ Manifest.toml
 # Benchmark datasets & external tools
 data/benchmark/*
 !data/benchmark/.gitkeep
+# Chapter 3 application data: everything is generated or downloaded,
+# except the raw DNA dataset (small, no stable public mirror yet)
+data/applications/**
+!data/applications/*/
+!data/applications/dna/human.txt
 *.zip
 tools/spmf.jar
 
 # Runtime, metrics & test outputs
 results/
+output/
 output*.txt
 *.tmp
+
+# Python bytecode cache
+__pycache__/
+*.py[cod]
 
 # Jupyter Notebook & IDE / OS files
 .ipynb_checkpoints/

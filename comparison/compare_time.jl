@@ -1,7 +1,8 @@
 """
     compare_time.jl
 
-Benchmark the Julia CHARM implementation against SPMF's Charm_bitset.
+Benchmark both Julia CHARM implementations (baseline `mine_file` and optimized
+`mine_file_bit`) against SPMF's Charm_bitset.
 
 The benchmark uses the same percentage support thresholds for both programs.
 SPMF accepts percentages, while the Julia implementation accepts an absolute
@@ -9,7 +10,7 @@ transaction count, so the latter is calculated with `ceil` for every dataset.
 
 Run from the repository root with:
 
-    julia comparison/compare_time.jl
+    julia --project=. comparison/compare_time.jl
 
 Set `SPMF_JAR` when the jar is not at `tools/spmf.jar`.  Results are written to
 `comparison/time_result.csv` (or to the path in `TIME_RESULTS`).
@@ -75,7 +76,7 @@ function csv_field(value)
 end
 
 function write_header(io)
-    println(io, "dataset,dataset_type,minsup_ratio,minsup_count,julia_itemsets,spmf_itemsets,julia_seconds,spmf_seconds")
+    println(io, "dataset,dataset_type,minsup_ratio,minsup_count,julia_itemsets,optimized_itemsets,spmf_itemsets,julia_seconds,optimized_seconds,spmf_seconds")
 end
 
 function process_memory_mb(pid)
@@ -160,7 +161,7 @@ function run_benchmark(dataset::AbstractString, input_path::AbstractString,
     for ratio in support_ratios
         minsup = max(1, ceil(Int, transaction_count * ratio))
         julia_output = tempname() * ".txt"
-        command = `$(Base.julia_cmd()) --project=$REPOSITORY_ROOT $(@__FILE__) --worker $input_path $minsup $julia_output`
+        command = `$(Base.julia_cmd()) --project=$REPOSITORY_ROOT $(@__FILE__) --worker basic $input_path $minsup $julia_output`
         julia_seconds, julia_memory_mb, julia_exceeded = run_monitored(command)
         if !memory_allowed(dataset, "Julia", julia_exceeded, julia_memory_mb)
             rm(julia_output; force = true)
@@ -168,6 +169,16 @@ function run_benchmark(dataset::AbstractString, input_path::AbstractString,
         end
         julia_itemsets = count_itemsets(julia_output)
         rm(julia_output; force = true)
+
+        optimized_output = tempname() * ".txt"
+        command = `$(Base.julia_cmd()) --project=$REPOSITORY_ROOT $(@__FILE__) --worker optimized $input_path $minsup $optimized_output`
+        optimized_seconds, optimized_memory_mb, optimized_exceeded = run_monitored(command)
+        if !memory_allowed(dataset, "Julia optimized", optimized_exceeded, optimized_memory_mb)
+            rm(optimized_output; force = true)
+            continue
+        end
+        optimized_itemsets = count_itemsets(optimized_output)
+        rm(optimized_output; force = true)
 
         spmf_output = tempname() * ".txt"
         command = `java -jar $jar run $SPMF_ALGORITHM $input_path $spmf_output $(string(round(ratio * 100; digits = 6))*"%")`
@@ -185,24 +196,29 @@ function run_benchmark(dataset::AbstractString, input_path::AbstractString,
             @sprintf("%.6f", ratio),
             string(minsup),
             string(julia_itemsets),
+            string(optimized_itemsets),
             string(spmf_itemsets),
             @sprintf("%.9f", julia_seconds),
+            @sprintf("%.9f", optimized_seconds),
             @sprintf("%.9f", spmf_seconds),
         ], ","))
         flush(io)
-        @info "Completed benchmark point" dataset minsup_ratio=ratio minsup julia_seconds spmf_seconds
+        @info "Completed benchmark point" dataset minsup_ratio=ratio minsup julia_seconds optimized_seconds spmf_seconds
     end
 end
 
 function worker()
-    length(ARGS) == 4 || error("Worker usage: --worker INPUT MINSUP OUTPUT")
-    input_path, minsup_text, output_path = ARGS[2:4]
-    mine_file(input_path; minsup = parse(Int, minsup_text), output_path = output_path)
+    length(ARGS) == 5 || error("Worker usage: --worker basic|optimized INPUT MINSUP OUTPUT")
+    implementation, input_path, minsup_text, output_path = ARGS[2:5]
+    mine = implementation == "optimized" ? mine_file_bit :
+           implementation == "basic" ? mine_file :
+           error("Unknown implementation: $implementation")
+    mine(input_path; minsup = parse(Int, minsup_text), output_path = output_path)
 end
 
 function main()
     jar = spmf_path()
-    isfile(jar) || error("Hong có SPMF ở ./tools/. Set SPMF_JAR to its location.")
+    isfile(jar) || error("SPMF jar not found at $jar. Download it to tools/spmf.jar or set SPMF_JAR.")
     Sys.which("java") === nothing && error("Java was not found on PATH.")
 
     output_path = get(ENV, "TIME_RESULTS", joinpath(@__DIR__, "time_result.csv"))
@@ -210,7 +226,7 @@ function main()
 
     paths = [(name, dataset_path(name)) for name in DATASET_NAMES]
     missing = [name for (name, path) in paths if path === nothing]
-    isempty(missing) || error("Missing dataset(s): $(join(missing, ", ")). Expected them in data/toy/ or data/.")
+    isempty(missing) || error("Missing dataset(s): $(join(missing, ", ")). Expected them in data/benchmark/.")
 
     open(output_path, "w") do io
         write_header(io)

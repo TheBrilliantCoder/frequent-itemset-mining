@@ -5,7 +5,7 @@ Peak-memory evaluation (Task 4) for CHARM:
 
   * basic     : Julia implementation without the optimization
   * optimized : Julia implementation with the optimization
-                (needs `CharmMining.mine_file_optimized`; skipped until it exists)
+                (`CharmMining.mine_file_bit`: BitVector + Int32 + @simd)
   * spmf      : SPMF `Charm_bitset` reference
 
 Every implementation runs in its own OS process.  Peak resident memory is read
@@ -77,7 +77,7 @@ spmf_path() = begin
     isempty(configured) ? joinpath(REPOSITORY_ROOT, "tools", "spmf.jar") : abspath(configured)
 end
 
-optimized_available() = isdefined(CharmMining, :mine_file_optimized)
+optimized_available() = isdefined(CharmMining, :mine_file_bit)
 
 count_itemsets(path) = count(line -> occursin("#SUP:", line), eachline(path))
 
@@ -185,8 +185,8 @@ function worker()
     if impl == "basic"
         mine_file(input; minsup = minsup, output_path = output)
     elseif impl == "optimized"
-        optimized_available() || error("CharmMining.mine_file_optimized is not defined")
-        CharmMining.mine_file_optimized(input; minsup = minsup, output_path = output)
+        optimized_available() || error("CharmMining.mine_file_bit is not defined")
+        CharmMining.mine_file_bit(input; minsup = minsup, output_path = output)
     else
         error("Unknown implementation: $impl")
     end
@@ -219,7 +219,7 @@ function main()
 
     impls = filter(IMPLEMENTATIONS) do impl
         if impl == "optimized" && !optimized_available()
-            @warn "CharmMining.mine_file_optimized not defined; skipping the optimized implementation"
+            @warn "CharmMining.mine_file_bit not defined; skipping the optimized implementation"
             return false
         end
         return true

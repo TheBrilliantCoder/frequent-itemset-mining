@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="600" viewBox="0 0 900 600">
+<rect width="100%" height="100%" fill="white"/>
+<text x="450" y="28" text-anchor="middle" font-family="sans-serif" font-size="20">Runtime: mushrooms</text>
+<line x1="90" y1="55" x2="90" y2="520" stroke="black"/>
+<line x1="90" y1="520" x2="870" y2="520" stroke="black"/>
+<line x1="90" y1="520.0" x2="870" y2="520.0" stroke="#dddddd"/>
+<text x="82" y="524.0" text-anchor="end" font-family="sans-serif" font-size="12">0.0</text>
+<line x1="90" y1="427.0" x2="870" y2="427.0" stroke="#dddddd"/>
+<text x="82" y="431.0" text-anchor="end" font-family="sans-serif" font-size="12">0.55</text>
+<line x1="90" y1="334.0" x2="870" y2="334.0" stroke="#dddddd"/>
+<text x="82" y="338.0" text-anchor="end" font-family="sans-serif" font-size="12">1.11</text>
+<line x1="90" y1="240.99999999999997" x2="870" y2="240.99999999999997" stroke="#dddddd"/>
+<text x="82" y="244.99999999999997" text-anchor="end" font-family="sans-serif" font-size="12">1.66</text>
+<line x1="90" y1="148.0" x2="870" y2="148.0" stroke="#dddddd"/>
+<text x="82" y="152.0" text-anchor="end" font-family="sans-serif" font-size="12">2.21</text>
+<line x1="90" y1="55.0" x2="870" y2="55.0" stroke="#dddddd"/>
+<text x="82" y="59.0" text-anchor="end" font-family="sans-serif" font-size="12">2.77</text>
+<text x="90.0" y="542" text-anchor="middle" font-family="sans-serif" font-size="12">80.0%</text>
+<text x="246.0" y="542" text-anchor="middle" font-family="sans-serif" font-size="12">60.0%</text>
+<text x="402.0" y="542" text-anchor="middle" font-family="sans-serif" font-size="12">50.0%</text>
+<text x="558.0" y="542" text-anchor="middle" font-family="sans-serif" font-size="12">20.0%</text>
+<text x="714.0" y="542" text-anchor="middle" font-family="sans-serif" font-size="12">10.0%</text>
+<text x="870.0" y="542" text-anchor="middle" font-family="sans-serif" font-size="12">5.0%</text>
+<polyline points="90.0,92.56147265882717 246.0,87.71965375140002 402.0,75.45204479848965 558.0,80.79323017536571 714.0,81.2173501814066 870.0,55.0" fill="none" stroke="#1565c0" stroke-width="3"/>
+<polyline points="90.0,476.7765167379112 246.0,478.63017078114547 402.0,472.75938297900586 558.0,474.98024797362336 714.0,471.1647451915823 870.0,465.5680388400945" fill="none" stroke="#d84315" stroke-width="3"/>
+<circle cx="90.0" cy="92.56147265882717" r="5" fill="white" stroke="#1565c0" stroke-width="2"/>
+<rect x="85.0" y="471.7765167379112" width="10" height="10" fill="white" stroke="#d84315" stroke-width="2"/>
+<circle cx="246.0" cy="87.71965375140002" r="5" fill="white" stroke="#1565c0" stroke-width="2"/>
+<rect x="241.0" y="473.63017078114547" width="10" height="10" fill="white" stroke="#d84315" stroke-width="2"/>
+<circle cx="402.0" cy="75.45204479848965" r="5" fill="white" stroke="#1565c0" stroke-width="2"/>
+<rect x="397.0" y="467.75938297900586" width="10" height="10" fill="white" stroke="#d84315" stroke-width="2"/>
+<circle cx="558.0" cy="80.79323017536571" r="5" fill="white" stroke="#1565c0" stroke-width="2"/>
+<rect x="553.0" y="469.98024797362336" width="10" height="10" fill="white" stroke="#d84315" stroke-width="2"/>
+<circle cx="714.0" cy="81.2173501814066" r="5" fill="white" stroke="#1565c0" stroke-width="2"/>
+<rect x="709.0" y="466.1647451915823" width="10" height="10" fill="white" stroke="#d84315" stroke-width="2"/>
+<circle cx="870.0" cy="55.0" r="5" fill="white" stroke="#1565c0" stroke-width="2"/>
+<rect x="865.0" y="460.5680388400945" width="10" height="10" fill="white" stroke="#d84315" stroke-width="2"/>
+<polyline points="90.0,84.59131673083151 246.0,92.93188135629072 402.0,82.39750726013881 558.0,86.89183792827377 714.0,90.05216753854944 870.0,80.15993188638299" fill="none" stroke="#2e7d32" stroke-width="3" stroke-dasharray="8 4"/>
+<polygon points="90.0,78.59131673083151 96.0,84.59131673083151 90.0,90.59131673083151 84.0,84.59131673083151" fill="white" stroke="#2e7d32" stroke-width="2"/>
+<polygon points="246.0,86.93188135629072 252.0,92.93188135629072 246.0,98.93188135629072 240.0,92.93188135629072" fill="white" stroke="#2e7d32" stroke-width="2"/>
+<polygon points="402.0,76.39750726013881 408.0,82.39750726013881 402.0,88.39750726013881 396.0,82.39750726013881" fill="white" stroke="#2e7d32" stroke-width="2"/>
+<polygon points="558.0,80.89183792827377 564.0,86.89183792827377 558.0,92.89183792827377 552.0,86.89183792827377" fill="white" stroke="#2e7d32" stroke-width="2"/>
+<polygon points="714.0,84.05216753854944 720.0,90.05216753854944 714.0,96.05216753854944 708.0,90.05216753854944" fill="white" stroke="#2e7d32" stroke-width="2"/>
+<polygon points="870.0,74.15993188638299 876.0,80.15993188638299 870.0,86.15993188638299 864.0,80.15993188638299" fill="white" stroke="#2e7d32" stroke-width="2"/>
+<text x="450" y="582" text-anchor="middle" font-family="sans-serif">Minimum support (high to low)</text>
+<text transform="translate(18 300) rotate(-90)" text-anchor="middle" font-family="sans-serif">Runtime (seconds)</text>
+<line x1="680" y1="35" x2="705" y2="35" stroke="#1565c0" stroke-width="3"/><text x="712" y="39" font-family="sans-serif">Basic</text>
+<line x1="560" y1="35" x2="585" y2="35" stroke="#2e7d32" stroke-width="3"/><text x="592" y="39" font-family="sans-serif">Optimized</text>
+<line x1="780" y1="35" x2="805" y2="35" stroke="#d84315" stroke-width="3"/><text x="812" y="39" font-family="sans-serif">SPMF</text>
+</svg>

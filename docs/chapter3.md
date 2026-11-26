@@ -14,23 +14,25 @@
 
 ### Application 1: Market Basket Analysis (E-commerce Data)
 
+> **Status:** Completed. See implementation in [`applications/market_basket/`](../applications/market_basket/), rule generator in [`src/rules.jl`](../src/rules.jl), Colab notebook in [`notebooks/app1_market_basket.ipynb`](../notebooks/app1_market_basket.ipynb), and full report analysis in [`docs/app1_market_basket.md`](app1_market_basket.md).
+
 1. **Dataset Selection & Preparation**:
-   - [ ] Acquire a real-world transaction dataset (e.g., *Online Retail* or *Instacart*).
-   - [ ] Clean anomalies (remove canceled orders, negative quantities, missing user/item IDs).
-   - [ ] Group items by `InvoiceNo` or `OrderID` into transactions.
-   - [ ] Convert transactions into SPMF `.txt` format and maintain an `item_id -> product_name` mapping dictionary.
+   - [x] Acquire a real-world transaction dataset (*UCI Online Retail*, 541,909 raw rows).
+   - [x] Clean anomalies (remove canceled orders `C*`, negative/zero quantities & prices, missing IDs/descriptions, and non-product service codes like `POST`/`DOT`/`M`).
+   - [x] Group items by `InvoiceNo` into 19,773 transactions across 3,787 unique products.
+   - [x] Convert transactions into SPMF `.txt` format and maintain an `item_id -> product_name` mapping dictionary (`item_mapping.csv`).
 
 2. **Mining & Rule Generation**:
-   - [ ] Run the group's algorithm across suitable `minsup` thresholds to produce meaningful frequent itemsets.
-   - [ ] Compute key association metrics for the discovered itemsets:
+   - [x] Run the group's Optimized CHARM (`CharmMining.mine_file_bit`) across 7 `minsup` thresholds (`5.0%` down to `0.8%`), mining 2,026 closed itemsets in 74.16 ms (median of 5 runs) at `minsup = 1.0%`.
+   - [x] Compute exact association metrics via Galois closure support lookup (`ClosureSupportIndex` in `src/rules.jl`):
      - **Support**
      - **Confidence**
-     - **Lift**
-   - [ ] Filter out trivial or uninformative itemsets.
+     - **Lift** (plus Leverage & Conviction)
+   - [x] Filter out trivial/non-product items and deduplicate symmetric pairs for Top-10 Lift ranking.
 
 3. **Business Interpretation & Actionable Insights**:
-   - [ ] Identify top cross-selling itemsets and complementary products.
-   - [ ] Propose realistic retail recommendations based on findings (e.g., product bundling, shelf/web layout redesign, promotional discounting).
+   - [x] Identify top cross-selling itemsets and complementary products (Herb Marker collection, Regency Tea sets, Wooden Christmas decorations, Poppy's Playhouse, Dolly Girl/Spaceboy cutlery, Garage/Shed key fobs).
+   - [x] Propose realistic retail recommendations (product bundling, one-click complete-the-set, cart-level cross-selling, seasonal promos, B2B assorted packs).
 
 ---
 

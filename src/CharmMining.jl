@@ -7,6 +7,7 @@ include("repository.jl")
 include("data.jl")
 include("engine.jl")
 include("pipeline.jl")
+include("rules.jl")
 include("optimized/Optimized.jl")
 
 using .Models
@@ -16,6 +17,7 @@ using .Properties
 using .Repository
 using .Engine
 using .Pipeline
+using .Rules
 using .Optimized
 
 export Item, Tid, Itemset, Tidset, VerticalDB, ITPair, ClosedItemset, support
@@ -25,6 +27,8 @@ export CharmRelation, EQUAL, LEFT_SUBSET, RIGHT_SUBSET, INCOMPARABLE,
        classify_relation, combine_nodes, charm_property
 export ClosedItemsetRepository, tid_checksum, consider!, results
 export charm, charm_extend, run_charm, mine_file
+export AssociationRule, ClosureSupportIndex, build_support_index, support_of,
+       generate_rules, top_rules_by_lift
 
 # Export toàn bộ API của bản Optimized ra Main
 export FastBitTidset, FastITNode, BitVerticalDB, to_vertical_bit,

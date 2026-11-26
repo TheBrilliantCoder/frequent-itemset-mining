@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="600" viewBox="0 0 900 600">
+<rect width="100%" height="100%" fill="white"/>
+<text x="450" y="28" text-anchor="middle" font-family="sans-serif" font-size="20">Frequent itemsets: mushrooms</text>
+<line x1="90" y1="55" x2="90" y2="520" stroke="black"/>
+<line x1="90" y1="520" x2="870" y2="520" stroke="black"/>
+<line x1="90" y1="520.0" x2="870" y2="520.0" stroke="#dddddd"/>
+<text x="82" y="524.0" text-anchor="end" font-family="sans-serif" font-size="12">0.0</text>
+<line x1="90" y1="427.0" x2="870" y2="427.0" stroke="#dddddd"/>
+<text x="82" y="431.0" text-anchor="end" font-family="sans-serif" font-size="12">2558.0</text>
+<line x1="90" y1="334.0" x2="870" y2="334.0" stroke="#dddddd"/>
+<text x="82" y="338.0" text-anchor="end" font-family="sans-serif" font-size="12">5116.0</text>
+<line x1="90" y1="241.0" x2="870" y2="241.0" stroke="#dddddd"/>
+<text x="82" y="245.0" text-anchor="end" font-family="sans-serif" font-size="12">7673.0</text>
+<line x1="90" y1="148.0" x2="870" y2="148.0" stroke="#dddddd"/>
+<text x="82" y="152.0" text-anchor="end" font-family="sans-serif" font-size="12">10231.0</text>
+<line x1="90" y1="55.0" x2="870" y2="55.0" stroke="#dddddd"/>
+<text x="82" y="59.0" text-anchor="end" font-family="sans-serif" font-size="12">12789.0</text>
+<text x="90.0" y="542" text-anchor="middle" font-family="sans-serif" font-size="12">80.0%</text>
+<text x="246.0" y="542" text-anchor="middle" font-family="sans-serif" font-size="12">60.0%</text>
+<text x="402.0" y="542" text-anchor="middle" font-family="sans-serif" font-size="12">50.0%</text>
+<text x="558.0" y="542" text-anchor="middle" font-family="sans-serif" font-size="12">20.0%</text>
+<text x="714.0" y="542" text-anchor="middle" font-family="sans-serif" font-size="12">10.0%</text>
+<text x="870.0" y="542" text-anchor="middle" font-family="sans-serif" font-size="12">5.0%</text>
+<polyline points="90.0,519.7091250293221 246.0,519.30917194464 402.0,518.3638282899367 558.0,477.49589490968805 714.0,343.65704902650714 870.0,55.0" fill="none" stroke="#1565c0" stroke-width="3"/>
+<polyline points="90.0,519.7091250293221 246.0,519.30917194464 402.0,518.3638282899367 558.0,477.49589490968805 714.0,343.65704902650714 870.0,55.0" fill="none" stroke="#d84315" stroke-width="3"/>
+<circle cx="90.0" cy="519.7091250293221" r="5" fill="white" stroke="#1565c0" stroke-width="2"/>
+<rect x="85.0" y="514.7091250293221" width="10" height="10" fill="white" stroke="#d84315" stroke-width="2"/>
+<circle cx="246.0" cy="519.30917194464" r="5" fill="white" stroke="#1565c0" stroke-width="2"/>
+<rect x="241.0" y="514.30917194464" width="10" height="10" fill="white" stroke="#d84315" stroke-width="2"/>
+<circle cx="402.0" cy="518.3638282899367" r="5" fill="white" stroke="#1565c0" stroke-width="2"/>
+<rect x="397.0" y="513.3638282899367" width="10" height="10" fill="white" stroke="#d84315" stroke-width="2"/>
+<circle cx="558.0" cy="477.49589490968805" r="5" fill="white" stroke="#1565c0" stroke-width="2"/>
+<rect x="553.0" y="472.49589490968805" width="10" height="10" fill="white" stroke="#d84315" stroke-width="2"/>
+<circle cx="714.0" cy="343.65704902650714" r="5" fill="white" stroke="#1565c0" stroke-width="2"/>
+<rect x="709.0" y="338.65704902650714" width="10" height="10" fill="white" stroke="#d84315" stroke-width="2"/>
+<circle cx="870.0" cy="55.0" r="5" fill="white" stroke="#1565c0" stroke-width="2"/>
+<rect x="865.0" y="50.0" width="10" height="10" fill="white" stroke="#d84315" stroke-width="2"/>
+<polyline points="90.0,519.7091250293221 246.0,519.30917194464 402.0,518.3638282899367 558.0,477.49589490968805 714.0,343.65704902650714 870.0,55.0" fill="none" stroke="#2e7d32" stroke-width="3" stroke-dasharray="8 4"/>
+<polygon points="90.0,513.7091250293221 96.0,519.7091250293221 90.0,525.7091250293221 84.0,519.7091250293221" fill="white" stroke="#2e7d32" stroke-width="2"/>
+<polygon points="246.0,513.30917194464 252.0,519.30917194464 246.0,525.30917194464 240.0,519.30917194464" fill="white" stroke="#2e7d32" stroke-width="2"/>
+<polygon points="402.0,512.3638282899367 408.0,518.3638282899367 402.0,524.3638282899367 396.0,518.3638282899367" fill="white" stroke="#2e7d32" stroke-width="2"/>
+<polygon points="558.0,471.49589490968805 564.0,477.49589490968805 558.0,483.49589490968805 552.0,477.49589490968805" fill="white" stroke="#2e7d32" stroke-width="2"/>
+<polygon points="714.0,337.65704902650714 720.0,343.65704902650714 714.0,349.65704902650714 708.0,343.65704902650714" fill="white" stroke="#2e7d32" stroke-width="2"/>
+<polygon points="870.0,49.0 876.0,55.0 870.0,61.0 864.0,55.0" fill="white" stroke="#2e7d32" stroke-width="2"/>
+<text x="450" y="582" text-anchor="middle" font-family="sans-serif">Minimum support (high to low)</text>
+<text transform="translate(18 300) rotate(-90)" text-anchor="middle" font-family="sans-serif">Number of frequent itemsets</text>
+<line x1="680" y1="35" x2="705" y2="35" stroke="#1565c0" stroke-width="3"/><text x="712" y="39" font-family="sans-serif">Basic</text>
+<line x1="560" y1="35" x2="585" y2="35" stroke="#2e7d32" stroke-width="3"/><text x="592" y="39" font-family="sans-serif">Optimized</text>
+<line x1="780" y1="35" x2="805" y2="35" stroke="#d84315" stroke-width="3"/><text x="812" y="39" font-family="sans-serif">SPMF</text>
+</svg>

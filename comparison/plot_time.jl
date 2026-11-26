@@ -24,6 +24,9 @@ function read_results(path)
                    ["dataset", "minsup_ratio", "julia_seconds", "spmf_seconds",
                     "julia_itemsets", "spmf_itemsets"])
     any(isnothing, values(columns)) && error("CSV is missing required timing columns")
+    # Optimized columns are optional so older CSVs (baseline vs SPMF only) still plot.
+    opt_seconds_col = findfirst(==("optimized_seconds"), headers)
+    opt_itemsets_col = findfirst(==("optimized_itemsets"), headers)
 
     rows = NamedTuple[]
     for line in lines[2:end]
@@ -36,6 +39,8 @@ function read_results(path)
             spmf = parse(Float64, fields[columns["spmf_seconds"]]),
             julia_itemsets = parse(Int, fields[columns["julia_itemsets"]]),
             spmf_itemsets = parse(Int, fields[columns["spmf_itemsets"]]),
+            optimized = opt_seconds_col === nothing ? NaN : parse(Float64, fields[opt_seconds_col]),
+            optimized_itemsets = opt_itemsets_col === nothing ? -1 : parse(Int, fields[opt_itemsets_col]),
         ))
     end
     return rows
@@ -48,7 +53,9 @@ function write_itemset_plot(path, dataset, rows)
     ratios = [row.ratio for row in rows]
     julia = Float64[row.julia_itemsets for row in rows]
     spmf = Float64[row.spmf_itemsets for row in rows]
-    maximum_count = max(maximum(julia), maximum(spmf), 1.0)
+    optimized = all(row -> row.optimized_itemsets >= 0, rows) ?
+        Float64[row.optimized_itemsets for row in rows] : nothing
+    maximum_count = max(maximum(julia), maximum(spmf), optimized === nothing ? 0.0 : maximum(optimized), 1.0)
     x = [left + (i - 1) * plot_width / max(length(rows) - 1, 1) for i in eachindex(rows)]
     y(value) = top + plot_height * (1 - value / maximum_count)
 
@@ -70,9 +77,11 @@ function write_itemset_plot(path, dataset, rows)
         println(io, "<polyline points=\"$(line_points(julia, x, y))\" fill=\"none\" stroke=\"#1565c0\" stroke-width=\"3\"/>")
         println(io, "<polyline points=\"$(line_points(spmf, x, y))\" fill=\"none\" stroke=\"#d84315\" stroke-width=\"3\"/>")
         write_markers(io, julia, spmf, x, y)
+        write_optimized(io, optimized, x, y)
         println(io, "<text x=\"$(width ÷ 2)\" y=\"$(height - 18)\" text-anchor=\"middle\" font-family=\"sans-serif\">Minimum support (high to low)</text>")
         println(io, "<text transform=\"translate(18 $(height ÷ 2)) rotate(-90)\" text-anchor=\"middle\" font-family=\"sans-serif\">Number of frequent itemsets</text>")
-        println(io, "<line x1=\"$(width - 220)\" y1=\"35\" x2=\"$(width - 195)\" y2=\"35\" stroke=\"#1565c0\" stroke-width=\"3\"/><text x=\"$(width - 188)\" y=\"39\" font-family=\"sans-serif\">Group</text>")
+        println(io, "<line x1=\"$(width - 220)\" y1=\"35\" x2=\"$(width - 195)\" y2=\"35\" stroke=\"#1565c0\" stroke-width=\"3\"/><text x=\"$(width - 188)\" y=\"39\" font-family=\"sans-serif\">$(optimized === nothing ? "Group" : "Basic")</text>")
+        optimized === nothing || println(io, "<line x1=\"$(width - 340)\" y1=\"35\" x2=\"$(width - 315)\" y2=\"35\" stroke=\"#2e7d32\" stroke-width=\"3\"/><text x=\"$(width - 308)\" y=\"39\" font-family=\"sans-serif\">Optimized</text>")
         println(io, "<line x1=\"$(width - 120)\" y1=\"35\" x2=\"$(width - 95)\" y2=\"35\" stroke=\"#d84315\" stroke-width=\"3\"/><text x=\"$(width - 88)\" y=\"39\" font-family=\"sans-serif\">SPMF</text>")
         println(io, "</svg>")
     end
@@ -89,6 +98,15 @@ function write_markers(io, julia, spmf, x_positions, y)
     end
 end
 
+function write_optimized(io, optimized, x_positions, y)
+    optimized === nothing && return
+    println(io, "<polyline points=\"$(line_points(optimized, x_positions, y))\" fill=\"none\" stroke=\"#2e7d32\" stroke-width=\"3\" stroke-dasharray=\"8 4\"/>")
+    for i in eachindex(x_positions)
+        xx, yy = x_positions[i], y(optimized[i])
+        println(io, "<polygon points=\"$xx,$(yy - 6) $(xx + 6),$yy $xx,$(yy + 6) $(xx - 6),$yy\" fill=\"white\" stroke=\"#2e7d32\" stroke-width=\"2\"/>")
+    end
+end
+
 function write_plot(path, dataset, rows)
     width, height = 900, 600
     left, right, top, bottom = 90, 30, 55, 80
@@ -96,7 +114,8 @@ function write_plot(path, dataset, rows)
     ratios = [row.ratio for row in rows]
     julia = [row.julia for row in rows]
     spmf = [row.spmf for row in rows]
-    maximum_time = max(maximum(julia), maximum(spmf), eps())
+    optimized = all(row -> !isnan(row.optimized), rows) ? [row.optimized for row in rows] : nothing
+    maximum_time = max(maximum(julia), maximum(spmf), optimized === nothing ? 0.0 : maximum(optimized), eps())
     x = [left + (i - 1) * plot_width / max(length(rows) - 1, 1) for i in eachindex(rows)]
     y(value) = top + plot_height * (1 - value / maximum_time)
 
@@ -118,9 +137,11 @@ function write_plot(path, dataset, rows)
         println(io, "<polyline points=\"$(line_points(julia, x, y))\" fill=\"none\" stroke=\"#1565c0\" stroke-width=\"3\"/>")
         println(io, "<polyline points=\"$(line_points(spmf, x, y))\" fill=\"none\" stroke=\"#d84315\" stroke-width=\"3\"/>")
         write_markers(io, julia, spmf, x, y)
+        write_optimized(io, optimized, x, y)
         println(io, "<text x=\"$(width ÷ 2)\" y=\"$(height - 18)\" text-anchor=\"middle\" font-family=\"sans-serif\">Minimum support (high to low)</text>")
         println(io, "<text transform=\"translate(18 $(height ÷ 2)) rotate(-90)\" text-anchor=\"middle\" font-family=\"sans-serif\">Runtime (seconds)</text>")
-        println(io, "<line x1=\"$(width - 220)\" y1=\"35\" x2=\"$(width - 195)\" y2=\"35\" stroke=\"#1565c0\" stroke-width=\"3\"/><text x=\"$(width - 188)\" y=\"39\" font-family=\"sans-serif\">Group</text>")
+        println(io, "<line x1=\"$(width - 220)\" y1=\"35\" x2=\"$(width - 195)\" y2=\"35\" stroke=\"#1565c0\" stroke-width=\"3\"/><text x=\"$(width - 188)\" y=\"39\" font-family=\"sans-serif\">$(optimized === nothing ? "Group" : "Basic")</text>")
+        optimized === nothing || println(io, "<line x1=\"$(width - 340)\" y1=\"35\" x2=\"$(width - 315)\" y2=\"35\" stroke=\"#2e7d32\" stroke-width=\"3\"/><text x=\"$(width - 308)\" y=\"39\" font-family=\"sans-serif\">Optimized</text>")
         println(io, "<line x1=\"$(width - 120)\" y1=\"35\" x2=\"$(width - 95)\" y2=\"35\" stroke=\"#d84315\" stroke-width=\"3\"/><text x=\"$(width - 88)\" y=\"39\" font-family=\"sans-serif\">SPMF</text>")
         println(io, "</svg>")
     end
