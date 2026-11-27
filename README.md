@@ -65,10 +65,10 @@ CharmMining/
 │   │   ├── run_mba.jl        # Khai thác bằng Optimized CHARM & sinh luật kết hợp (Top-10 Lift)
 │   │   ├── posthoc_analysis.py # Kiểm chứng hậu kiểm (Herb Marker 1..6, mùa vụ & in-season Lift, CustomerID)
 │   │   └── plot_mba.py       # Vẽ 4 biểu đồ phân tích độ phân giải cao
-│   └── dna/                  # Ứng dụng 2: Khai thác motif k-mer trên trình tự DNA người (7 họ protein)
-│       ├── eda.py            # Tiền xử lý (lọc độ dài, khử trùng lặp) & thống kê mô tả
-│       ├── run_dna.jl        # Mã hóa k-mer -> SPMF và khai thác CHARM toàn cục (k=6) & theo lớp (k=8)
-│       └── analysis.py       # Ghép contig, GC/CpG, dịch mã 3 khung, xuất CSV phân tích sinh học
+│   └── dna/                  # Ứng dụng 2: Khai thác motif promoter E. coli (UCI Promoter Gene Sequences, 2 lớp +/-)
+│       ├── cluster.py        # Hồ sơ hóa IC/chi-bình phương theo tọa độ & phân cụm vùng điểm nóng (C1, C2, C3)
+│       ├── run_dna.jl        # Mã hóa 5-mer theo cụm + nhãn lớp và khai thác CHARM (minsup = 5)
+│       └── report.py         # Lọc tương phản (Confidence, Lift, Growth Rate, chi-bình phương), ghép chuỗi & xuất CSV
 ├── requirements.txt          # Thư viện Python cho Chương 3 (pandas, openpyxl, matplotlib)
 ├── scripts/
 │   └── download_data.py      # Tải benchmark, spmf.jar, UCI Online Retail (kiểm tra SHA-256)
@@ -82,7 +82,7 @@ CharmMining/
 ├── data/
 │   ├── toy/                  # CSDL nhỏ kiểm thử nhanh (contextPasquier99.txt)
 │   ├── benchmark/            # CSDL benchmark chuẩn FIMI (chess, mushrooms, retail, T10I4D100K, accidents)
-│   └── applications/         # Dữ liệu Chương 3 (online_retail/ tự tải; dna/human.txt có sẵn)
+│   └── applications/         # Dữ liệu Chương 3 (online_retail/ tự tải; dna/promoters.data có sẵn)
 ├── results/                  # Kết quả sinh tự động (bị .gitignore): app1/, app2/
 └── test/
     ├── runtests.jl           # Master test runner
@@ -281,14 +281,14 @@ Các tập dữ liệu benchmark được lưu trữ cục bộ trong `data/benc
 - **Báo cáo phân tích & diễn giải kinh doanh:** `docs/app1_market_basket.md`
 - **Kết quả & biểu đồ:** `results/app1/` (bảng độ nhạy `minsup_sensitivity.csv`, 962 luật tại `minsup = 1.0%`, `minconf = 50%`, Top-10 luật theo Lift và 4 biểu đồ phân tích trong `results/app1/figures/`).
 
-### Ứng dụng 2: Khai thác motif trên trình tự DNA (Human DNA — 7 họ protein)
-Mỗi trình tự DNA được mã hóa thành tập các **k-mer** (cửa sổ trượt) và khai thác bằng **Optimized CHARM** (`to_vertical_bit` + `run_charm_bit`): toàn cục với `k = 6`, `minsup = 30%` (nhãn lớp `CLASS_i` được thêm vào giao dịch), và riêng từng họ protein với `k = 8`, `minsup = 15%`.
+### Ứng dụng 2: Khai thác motif promoter E. coli (UCI Promoter Gene Sequences)
+Bộ dữ liệu gồm 106 trình tự (53 promoter `+` / 53 non-promoter `-`), mỗi trình tự dài 57 bp (vị trí `p-50`..`p7`). Mỗi trình tự được mã hóa thành giao dịch gồm nhãn `class=±` và các **5-mer trượt theo cụm tọa độ** (`C1_xxxxx`, `C2_xxxxx`, `C3_xxxxx`), sau đó khai thác bằng **Optimized CHARM** (`to_vertical_bit` + `run_charm_bit`) với `k = 5`, `minsup = 5`.
 
 - **Pipeline:**
   ```bash
-  python applications/dna/eda.py        # -> data/applications/dna/human_preprocessed.txt
-  julia --project=. applications/dna/run_dna.jl
-  python applications/dna/analysis.py
+  python applications/dna/cluster.py    # -> results/app2/promoter_analysis/coordinate_profiling.csv
+  julia --project=. applications/dna/run_dna.jl   # -> results/app2/promoters_charm_output.txt
+  python applications/dna/report.py     # -> results/app2/promoter_analysis/*.csv
   ```
-- **Kết quả:** `results/app2/` (`global_closed_itemsets_k6.txt`, `per_class_charm/`, `bio_analysis/*.csv`).
+- **Kết quả:** `results/app2/` (`promoters_charm_output.txt`, `promoter_analysis/all_closed_motifs.csv`, `discriminative_promoters.csv`).
 - **Báo cáo phân tích:** `docs/dna.md`

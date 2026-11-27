@@ -8,10 +8,10 @@ Manifest.toml
 data/benchmark/*
 !data/benchmark/.gitkeep
 # Chapter 3 application data: everything is generated or downloaded,
-# except the raw DNA dataset (small, no stable public mirror yet)
+# except the E. coli promoter dataset (small, no stable public mirror yet)
 data/applications/**
 !data/applications/*/
-!data/applications/dna/human.txt
+!data/applications/dna/promoters.data
 *.zip
 tools/spmf.jar
 
